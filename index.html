@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FB Collections Business Collections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: app shell — slim top bar with the two always-on exits (talk to a person, tell us about your situation),
+   a single focused column (max 720px) for journeys, a two-column dashboard (max 1040px), and a fixed prototype
+   control bar at the bottom that is visibly not part of the product. */
+:root{
+  --bg:#F6F6F5; --surface:#FFFFFF; --surface-2:#EFEFEE; --surface-3:#FAFAFA;
+  --ink:#16191D; --ink-2:#424B58; --ink-3:#6B7280; --line:#DEDEDD; --line-2:#ECECEB;
+  --brand:#C02227; --brand-ink:#FFFFFF; --brand-soft:#F6E1E2; --brand-deep:#A7222C; --brand-tint:#F8F5F5;
+  --good:#1E7A4D; --good-soft:#DCF1E5; --warn:#8A5A12; --warn-soft:#FBEFD6; --crit:#B54708; --crit-soft:#FDEAD7;
+  --note:#5B3C9E; --note-soft:#EFE9FA; --note-line:#C7B7EA;
+  --shadow:0 1px 2px rgba(15,15,15,.05), 0 10px 28px rgba(15,15,15,.07);
+  --font-display:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:12px; --r-s:8px; --r-xs:4px;
+  --fb-black:#0F0F0F; --fb-red:#C02227;
+  --demo-bg:#1C1C1C; --demo-fg:#E6E6E6; --demo-line:#333333; --demo-accent:#F28C8F;
+  --base:17px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111111; --surface:#1A1A1A; --surface-2:#242424; --surface-3:#161616;
+    --ink:#EDEDED; --ink-2:#C2C6CC; --ink-3:#9A9FA6; --line:#2E2E2E; --line-2:#262626;
+    --brand:#EF6B6F; --brand-ink:#1A0506; --brand-soft:#3A1A1C; --brand-deep:#F59A9D; --brand-tint:#1F1919;
+    --good:#62CC98; --good-soft:#163B2A; --warn:#E6B562; --warn-soft:#3A2E14; --crit:#F4A261; --crit-soft:#3A2614;
+    --note:#C7B2F2; --note-soft:#26203A; --note-line:#4D3F75;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111111; --surface:#1A1A1A; --surface-2:#242424; --surface-3:#161616;
+  --ink:#EDEDED; --ink-2:#C2C6CC; --ink-3:#9A9FA6; --line:#2E2E2E; --line-2:#262626;
+  --brand:#EF6B6F; --brand-ink:#1A0506; --brand-soft:#3A1A1C; --brand-deep:#F59A9D; --brand-tint:#1F1919;
+  --good:#62CC98; --good-soft:#163B2A; --warn:#E6B562; --warn-soft:#3A2E14; --crit:#F4A261; --crit-soft:#3A2614;
+  --note:#C7B2F2; --note-soft:#26203A; --note-line:#4D3F75;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+:root[data-text="large"]{ --base:20px; }
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ font-size:var(--base); }
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:1rem; line-height:1.5;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  padding-bottom:calc(76px + env(safe-area-inset-bottom,0px));
+}
+h1,h2,h3,h4{ font-family:var(--font-display); line-height:1.15; margin:0; text-wrap:balance; letter-spacing:-.01em; }
+h1{ font-size:clamp(1.7rem,2.6vw + 1rem,2.35rem); font-weight:600; }
+h2{ font-size:1.35rem; font-weight:600; }
+h3{ font-size:1.1rem; font-weight:600; }
+p{ margin:0; }
+a{ color:var(--brand); text-decoration-thickness:1px; text-underline-offset:.15em; }
+a:hover{ text-decoration-thickness:2px; }
+button{ font:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus,var(--brand)); outline-offset:2px; border-radius:4px; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.num{ font-variant-numeric:tabular-nums; }
+.muted{ color:var(--ink-2); }
+.small{ font-size:.9rem; }
+.xs{ font-size:.8rem; }
+.eyebrow{ font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:600; }
+.lede{ font-size:1.1rem; color:var(--ink-2); max-width:40em; }
+.measure{ max-width:38em; }
+hr.sep{ border:0; border-top:1px solid var(--line); margin:0; }
+
+/* Shell */
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+  background:var(--surface); border-bottom:1px solid var(--line);
+}
+.top-inner{
+  max-width:1120px; margin:0 auto; padding:10px 16px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+.brand{ display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-family:var(--font-display); font-weight:700; font-size:1.15rem; letter-spacing:-.01em; }
+.brand .mark{ width:30px; height:30px; display:block; flex:none; }
+.brand small{ display:block; font-family:var(--font-body); font-weight:500; font-size:.7rem; color:var(--ink-3); letter-spacing:.06em; text-transform:uppercase; line-height:1; margin-top:2px; }
+.top-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.subnav{ background:var(--surface); border-bottom:1px solid var(--line); }
+.subnav-inner{ max-width:1120px; margin:0 auto; padding:0 16px; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; }
+.subnav-inner::-webkit-scrollbar{ display:none; }
+.subnav a{
+  display:inline-block; padding:10px 12px; color:var(--ink-2); text-decoration:none; font-weight:500; font-size:.95rem;
+  border-bottom:3px solid transparent; white-space:nowrap;
+}
+.subnav a[aria-current="page"]{ color:var(--ink); border-bottom-color:var(--brand); }
+.subnav a:hover{ color:var(--ink); }
+.subnav a.help{
+  margin-left:auto; align-self:center; display:inline-flex; align-items:center; gap:8px;
+  background:var(--brand); color:var(--brand-ink); border-radius:999px; padding:8px 14px; margin-block:6px;
+  border-bottom:0; font-weight:600; box-shadow:0 1px 2px rgba(21,37,40,.12);
+}
+.subnav a.help:hover{ filter:brightness(1.06); color:var(--brand-ink); }
+.subnav a.help[aria-current="page"]{ outline:3px solid color-mix(in srgb,var(--brand) 30%,transparent); outline-offset:2px; }
+.subnav a.help .icon{ width:18px; height:18px; }
+@media (max-width:640px){ .subnav-inner{ flex-wrap:wrap; overflow:visible; } .subnav a{ padding:10px 8px; font-size:.9rem; } .subnav a.help{ flex:1 1 100%; justify-content:center; margin:4px 0 10px; padding:11px 14px; } }
+main{ max-width:1120px; margin:0 auto; padding:28px 16px 48px; }
+.col{ max-width:720px; margin:0 auto; }
+.wide{ max-width:1040px; margin:0 auto; }
+.grid-2{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,320px); gap:28px; align-items:start; }
+@media (max-width:860px){ .grid-2{ grid-template-columns:minmax(0,1fr); } }
+.stack{ display:flex; flex-direction:column; gap:16px; }
+.stack-s{ display:flex; flex-direction:column; gap:8px; }
+.stack-l{ display:flex; flex-direction:column; gap:28px; }
+.row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+.between{ justify-content:space-between; }
+.grow{ flex:1 1 auto; min-width:0; }
+
+/* Cards */
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:22px; }
+.card.soft{ background:var(--brand-tint); border-color:transparent; }
+.card.tint{ background:var(--surface-2); border-color:transparent; }
+.card.raised{ box-shadow:var(--shadow); border-color:transparent; }
+.card h2,.card h3{ margin-bottom:6px; }
+.card > * + *{ margin-top:12px; }
+.card .row,.card .stack,.card .stack-s{ margin-top:12px; }
+.card .row:first-child,.card .stack:first-child{ margin-top:0; }
+.banner{ border-radius:var(--r); padding:18px 20px; border:1px solid transparent; }
+.banner.warn{ background:var(--warn-soft); border-color:color-mix(in srgb,var(--warn) 30%,transparent); }
+.banner.good{ background:var(--good-soft); }
+.banner.info{ background:var(--brand-soft); }
+.banner.crit{ background:var(--crit-soft); }
+.banner h2{ font-size:1.15rem; }
+.banner > * + *{ margin-top:10px; }
+
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 18px; border-radius:999px; border:1.5px solid transparent;
+  font-weight:600; font-size:1rem; line-height:1.2; cursor:pointer; text-decoration:none; text-align:center;
+  background:var(--brand); color:var(--brand-ink); min-height:46px; transition:transform .06s ease, background .15s ease;
+}
+.btn:hover{ filter:brightness(1.05); }
+.btn:active{ transform:translateY(1px); }
+.btn.secondary{ background:var(--surface); color:var(--brand); border-color:var(--brand); }
+.btn.secondary:hover{ background:var(--brand-tint); }
+.btn.ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+.btn.ghost:hover{ background:var(--surface-2); }
+.btn.quiet{ background:var(--surface-2); color:var(--ink); }
+.btn.sm{ padding:8px 14px; min-height:36px; font-size:.9rem; }
+.btn.block{ width:100%; }
+.btn[disabled]{ opacity:.5; cursor:not-allowed; }
+.btn.warnbtn{ background:var(--warn); color:#fff; }
+.linkbtn{ background:none; border:0; padding:0; color:var(--brand); font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:.15em; }
+.link-row{ display:flex; gap:16px; flex-wrap:wrap; }
+
+/* Options (three structurally different routes) */
+.options{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+@media (max-width:760px){ .options{ grid-template-columns:minmax(0,1fr); } }
+.opt{
+  display:flex; flex-direction:column; gap:10px; text-align:left; background:var(--surface); border:1.5px solid var(--line);
+  border-radius:var(--r); padding:20px; cursor:pointer; min-height:170px; color:var(--ink); text-decoration:none;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .06s ease;
+}
+.opt:hover{ border-color:var(--brand); box-shadow:var(--shadow); }
+.opt .ic{ width:40px; height:40px; border-radius:12px; background:var(--brand-soft); color:var(--brand); display:grid; place-items:center; flex:none; }
+.opt .ic svg{ width:22px; height:22px; }
+.opt h3{ font-size:1.15rem; }
+.opt p{ color:var(--ink-2); font-size:.95rem; flex:1; }
+.opt .go{ color:var(--brand); font-weight:600; font-size:.95rem; }
+
+/* Balance */
+.balance{ display:flex; flex-direction:column; gap:6px; }
+.balance .amt{ font-family:var(--font-display); font-weight:700; font-size:clamp(2.4rem,4vw + 1rem,3.4rem); line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.kv{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; }
+.kv dt{ color:var(--ink-2); }
+.kv dd{ margin:0; text-align:right; font-variant-numeric:tabular-nums; font-weight:500; }
+.kv dd.total{ font-weight:700; }
+.kv .line{ grid-column:1 / -1; border-top:1px solid var(--line); margin:4px 0; }
+table.tbl{ width:100%; border-collapse:collapse; font-size:.95rem; }
+table.tbl th,table.tbl td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+table.tbl th{ font-size:.75rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); font-weight:600; }
+table.tbl td.num,table.tbl th.num{ text-align:right; }
+.tscroll{ overflow-x:auto; }
+
+/* Handler */
+.handler{ display:flex; gap:14px; align-items:center; }
+.avatar{ width:48px; height:48px; border-radius:50%; background:var(--brand-soft); color:var(--brand); display:grid; place-items:center; font-weight:700; font-family:var(--font-display); flex:none; }
+
+/* Pills */
+.pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:.8rem; font-weight:600; background:var(--surface-2); color:var(--ink-2); }
+.pill.good{ background:var(--good-soft); color:var(--good); }
+.pill.warn{ background:var(--warn-soft); color:var(--warn); }
+.pill.brand{ background:var(--brand-soft); color:var(--brand); }
+.pill.crit{ background:var(--crit-soft); color:var(--crit); }
+.pill .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; }
+
+/* Forms */
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field label,.legend{ font-weight:600; }
+.hint{ color:var(--ink-2); font-size:.9rem; }
+.input,select.input,textarea.input{
+  width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:var(--r-s); background:var(--surface); color:var(--ink);
+  font:inherit; min-height:48px;
+}
+.input:focus{ border-color:var(--brand); outline:3px solid color-mix(in srgb,var(--brand) 25%,transparent); outline-offset:0; }
+textarea.input{ min-height:110px; resize:vertical; }
+.money{ position:relative; }
+.money .input{ padding-left:34px; }
+.money::before{ content:"£"; position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--ink-2); font-weight:600; }
+.inline-fields{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+fieldset{ border:0; padding:0; margin:0; min-width:0; }
+.choices{ display:grid; gap:10px; }
+.choices.cols{ grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+.choice{
+  display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border:1.5px solid var(--line); border-radius:var(--r-s); background:var(--surface); cursor:pointer;
+}
+.choice:hover{ border-color:var(--brand); }
+.choice input{ margin-top:4px; accent-color:var(--brand); width:18px; height:18px; flex:none; }
+.choice.on{ border-color:var(--brand); background:var(--brand-tint); }
+.choice .t{ font-weight:600; }
+.choice .d{ color:var(--ink-2); font-size:.92rem; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  padding:10px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; font-weight:500; font-size:.95rem; text-align:left;
+}
+.chip:hover{ border-color:var(--brand); }
+.chip.on{ background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+.check{ display:flex; gap:12px; align-items:flex-start; cursor:pointer; }
+.check input{ width:20px; height:20px; margin-top:3px; accent-color:var(--brand); flex:none; }
+.otp{ display:flex; gap:8px; }
+.otp input{ width:100%; max-width:52px; height:56px; text-align:center; font-size:1.4rem; font-weight:600; border:1.5px solid var(--line); border-radius:var(--r-s); background:var(--surface); color:var(--ink); font-variant-numeric:tabular-nums; }
+.toggle{ display:inline-flex; align-items:center; gap:10px; cursor:pointer; }
+.toggle input{ appearance:none; width:44px; height:26px; border-radius:999px; background:var(--line); position:relative; transition:background .15s; flex:none; margin:0; }
+.toggle input::after{ content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:transform .15s; box-shadow:0 1px 2px rgba(0,0,0,.2); }
+.toggle input:checked{ background:var(--brand); }
+.toggle input:checked::after{ transform:translateX(18px); }
+
+/* Steps */
+.steps{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+.steps span{ height:6px; flex:1; border-radius:3px; background:var(--line); }
+.steps span.done{ background:var(--brand); }
+.steps span.now{ background:var(--brand); opacity:.55; }
+.plan-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+.plan-card{ text-align:left; padding:16px; border:1.5px solid var(--line); border-radius:var(--r-s); background:var(--surface); cursor:pointer; display:flex; flex-direction:column; gap:4px; }
+.plan-card:hover{ border-color:var(--brand); }
+.plan-card.on{ border-color:var(--brand); background:var(--brand-tint); box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 20%,transparent); }
+.plan-card .a{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; font-variant-numeric:tabular-nums; }
+.plan-card .d{ color:var(--ink-2); font-size:.9rem; }
+
+/* Progress ring */
+.ring-wrap{ display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+.ring{ width:128px; height:128px; flex:none; }
+.ring circle{ fill:none; stroke-width:12; }
+.ring .track{ stroke:var(--surface-2); }
+.ring .bar{ stroke:var(--good); stroke-linecap:round; transform:rotate(-90deg); transform-origin:50% 50%; transition:stroke-dasharray .6s ease; }
+.ring text{ font-family:var(--font-display); font-weight:700; fill:var(--ink); font-size:26px; }
+.ring text.sub{ font-family:var(--font-body); font-weight:500; fill:var(--ink-2); font-size:11px; }
+.bar-h{ height:10px; border-radius:5px; background:var(--surface-2); overflow:hidden; }
+.bar-h i{ display:block; height:100%; background:var(--good); border-radius:5px; }
+
+/* Timeline */
+.tl{ list-style:none; padding:0; margin:0; display:grid; gap:0; }
+.tl li{ display:grid; grid-template-columns:18px minmax(0,1fr); gap:12px; padding:10px 0; position:relative; }
+.tl li::before{ content:""; width:10px; height:10px; border-radius:50%; background:var(--brand); margin-top:7px; margin-left:4px; }
+.tl li::after{ content:""; position:absolute; left:8px; top:28px; bottom:-10px; width:2px; background:var(--line); }
+.tl li:last-child::after{ display:none; }
+.tl .when{ font-size:.85rem; color:var(--ink-3); }
+
+/* Support cards */
+.orgs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+.org{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:8px; }
+.org .logo{
+  min-height:56px; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; background:var(--surface-2); color:var(--ink);
+  font-family:var(--font-display); font-weight:700; letter-spacing:-.01em; font-size:1rem; line-height:1.15; position:relative;
+}
+.org .logo .mk{ width:32px; height:32px; border-radius:8px; background:var(--brand); color:var(--brand-ink); display:grid; place-items:center; font-size:.8rem; letter-spacing:.02em; flex:none; }
+.org .logo.has{ background:#fff; border:1px solid var(--line); justify-content:flex-start; padding:8px 12px; gap:12px; color:#16191D; }
+.org .logo.has img{ max-height:40px; max-width:96px; width:auto; object-fit:contain; display:block; flex:none; }
+.org .logo.has span{ min-width:0; }
+.logo-grid{ display:grid; gap:10px; }
+.logo-row{ display:grid; grid-template-columns:72px minmax(0,1fr) auto; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); }
+.logo-row .pv{ height:40px; display:flex; align-items:center; justify-content:center; background:var(--surface-2); border-radius:6px; overflow:hidden; }
+.logo-row .pv img{ max-height:36px; max-width:68px; object-fit:contain; }
+.logo-row input[type=file]{ display:none; }
+.org .who{ color:var(--ink-2); font-size:.92rem; flex:1; }
+.org .ct{ font-size:.92rem; display:grid; gap:2px; }
+.org .ct b{ font-variant-numeric:tabular-nums; }
+.org .tags{ display:flex; gap:6px; flex-wrap:wrap; }
+.org .tags span{ font-size:.72rem; padding:2px 8px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); font-weight:600; }
+.crisis{ background:var(--ink); color:var(--bg); border-radius:var(--r); padding:18px 20px; }
+.crisis b{ font-variant-numeric:tabular-nums; }
+.crisis a{ color:inherit; }
+
+/* Accordion */
+details.acc{ border-top:1px solid var(--line); }
+details.acc:last-of-type{ border-bottom:1px solid var(--line); }
+details.acc summary{ cursor:pointer; padding:14px 0; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:12px; align-items:center; }
+details.acc summary::-webkit-details-marker{ display:none; }
+details.acc summary::after{ content:"+"; font-size:1.3rem; color:var(--brand); flex:none; width:24px; text-align:center; }
+details.acc[open] summary::after{ content:"–"; }
+details.acc .body{ padding:0 0 16px; color:var(--ink-2); max-width:40em; }
+details.acc .body > * + *{ margin-top:8px; }
+
+/* Design rationale notes */
+.dn{ display:none; }
+body.notes .dn{
+  display:block; margin-top:12px; padding:10px 12px 10px 14px; border-left:3px solid var(--note); background:var(--note-soft);
+  border-radius:0 var(--r-xs) var(--r-xs) 0; font-size:.86rem; color:var(--ink); line-height:1.45;
+}
+.dn .tag{ display:inline-block; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--note); margin-right:6px; }
+.dn cite{ display:block; font-style:normal; color:var(--ink-2); margin-top:4px; font-size:.8rem; }
+.dn.inline{ margin-top:0; }
+
+/* Footer */
+.foot{ border-top:1px solid var(--line); background:var(--surface); }
+.foot-inner{ max-width:1120px; margin:0 auto; padding:28px 16px 32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px; font-size:.88rem; color:var(--ink-2); }
+.foot h4{ font-family:var(--font-body); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:8px; }
+.foot ul{ list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+.foot .legal{ grid-column:1 / -1; border-top:1px solid var(--line); padding-top:16px; font-size:.82rem; color:var(--ink-3); max-width:72em; }
+
+/* Prototype control bar */
+.demo{
+  position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--demo-bg); color:var(--demo-fg); border-top:1px solid var(--demo-line);
+  padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px)); font-size:.82rem;
+}
+.demo-inner{ max-width:1120px; margin:0 auto; display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; }
+.demo .tag{ font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:.68rem; color:var(--demo-accent); border:1px solid var(--demo-accent); border-radius:4px; padding:2px 6px; }
+.demo label{ display:inline-flex; align-items:center; gap:6px; }
+.demo select,.demo button{
+  font:inherit; font-size:.82rem; background:#2A2A2A; color:var(--demo-fg); border:1px solid var(--demo-line); border-radius:6px; padding:5px 8px; cursor:pointer;
+}
+.demo button.on{ background:var(--demo-accent); color:#0E1A1C; border-color:var(--demo-accent); font-weight:700; }
+.demo .spacer{ flex:1; }
+.demo .hintx{ color:#A8A8A8; }
+@media (max-width:640px){ .demo .hintx{ display:none; } }
+
+/* Toast and modal */
+.toast{ position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px); z-index:40; background:var(--ink); color:var(--bg); padding:12px 18px; border-radius:12px; font-size:.95rem; max-width:min(92vw,560px); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; box-shadow:var(--shadow); }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.modal-bg{ position:fixed; inset:0; z-index:50; background:rgba(10,20,22,.55); display:none; align-items:center; justify-content:center; padding:16px; }
+.modal-bg.open{ display:flex; }
+.modal{ background:var(--surface); color:var(--ink); border-radius:var(--r); padding:24px; max-width:520px; width:100%; box-shadow:var(--shadow); max-height:90vh; overflow:auto; }
+.modal > * + *{ margin-top:12px; }
+
+/* Misc */
+.opt-ic{ display:inline-grid; place-items:center; width:36px; height:36px; border-radius:10px; background:var(--brand-soft); color:var(--brand); flex:none; }
+@media (max-width:860px){ .budget-grid aside{ order:-1; } }
+.icon{ width:20px; height:20px; flex:none; }
+.hero-mark{ width:72px; height:72px; }
+.verify-tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+.verify-tabs button{ padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; font-weight:600; font-size:.92rem; }
+.verify-tabs button.on{ background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+.notice{ display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:var(--r-s); background:var(--surface-2); font-size:.95rem; }
+.notice .icon{ color:var(--brand); margin-top:2px; }
+.two{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+.badge-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.proto-note{ font-size:.78rem; color:var(--ink-3); border:1px dashed var(--line); border-radius:6px; padding:4px 8px; display:inline-block; }
+.fade{ animation:fade .25s ease; }
+@keyframes fade{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+@media (max-width:480px){ .card{ padding:18px; } main{ padding-top:20px; } .top-inner{ padding:8px 12px; } .brand small{ display:none; } .btn.sm .label{ display:none; } .top-actions .btn.sm{ padding:8px 10px; } }
+
+/* Flint Bishop house style: black header and footer, serif headings, red section titles, square red buttons */
+.top{ background:var(--fb-black); border-bottom:0; }
+.top .brand{ color:#FFFFFF; font-family:var(--font-display); font-weight:500; font-size:1.4rem; letter-spacing:-.01em; gap:12px; }
+.top .brand .mark{ width:4px; height:36px; }
+.top .brand small{ color:#B5B5B5; font-family:var(--font-body); font-weight:500; }
+.top .btn.ghost{ color:#FFFFFF; border-color:rgba(255,255,255,.35); background:transparent; }
+.top .btn.ghost:hover{ background:rgba(255,255,255,.08); }
+.top .btn.secondary{ background:var(--fb-red); color:#FFFFFF; border-color:var(--fb-red); }
+.top .btn.secondary:hover{ background:#A7222C; }
+h1{ font-weight:500; letter-spacing:-.005em; }
+h2{ font-weight:500; color:var(--brand); letter-spacing:0; }
+h3{ font-weight:600; letter-spacing:0; }
+.banner h2{ color:var(--ink); }
+.btn{ border-radius:3px; text-transform:uppercase; letter-spacing:.05em; font-size:.88rem; font-weight:600; }
+.btn.sm{ font-size:.76rem; }
+.btn.secondary{ background:var(--surface); }
+.subnav a.help{ border-radius:3px; text-transform:uppercase; letter-spacing:.05em; font-size:.82rem; }
+.subnav a[aria-current="page"]{ border-bottom-color:var(--fb-red); }
+.banner.info{ background:var(--surface-2); border-left:4px solid var(--brand); border-radius:0 var(--r) var(--r) 0; }
+.foot{ background:var(--fb-black); border-top:0; }
+.foot-inner{ color:#C9C9C9; }
+.foot h4{ color:#9A9A9A; }
+.foot a{ color:#FFFFFF; }
+.foot .legal{ border-top-color:#2A2A2A; color:#9A9A9A; }
+.demo button.on{ color:#1A0506; }
+a{ color:var(--ink); text-decoration-color:var(--brand); }
+a:hover{ color:var(--brand); }
+.pill.brand{ background:var(--surface-2); color:var(--ink); }
+.notice .icon{ color:var(--ink-2); }
+
+/* (money check styles retained for shared classes) */
+button.opt{ font:inherit; width:100%; }
+.ie-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px 22px; }
+.ie-field label{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.ie-field .hint{ margin-top:-2px; font-size:.85rem; }
+.ie-inrow{ display:flex; gap:8px; align-items:stretch; }
+.ie-inrow .money{ flex:1 1 auto; min-width:0; }
+.ie-freq{ flex:0 0 auto; width:auto; max-width:52%; }
+.ie-bank{ font-size:.7rem; padding:2px 8px; }
+.ie-guide{ font-size:.84rem; }
+.ie-run{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 18px; }
+.ie-run div, .ie-summary div{ display:flex; flex-direction:column; gap:2px; }
+.ie-run b{ font-size:1.15rem; }
+.ie-summary{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.ie-summary b{ font-family:var(--font-display); font-size:clamp(1.4rem,2vw + .8rem,2rem); font-weight:600; line-height:1.1; }
+.ie-bars{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px 12px; align-items:center; }
+.ie-bars .lab{ font-size:.85rem; color:var(--ink-2); white-space:nowrap; }
+.ie-bars .bar{ height:16px; background:var(--surface-2); border-radius:4px; overflow:hidden; display:flex; }
+.ie-bars .seg{ height:100%; display:block; }
+.s-in{ background:var(--good); } .s-bills{ background:var(--ink-2); } .s-every{ background:var(--ink-3); } .s-debts{ background:var(--warn); }
+.ie-legend{ display:flex; flex-wrap:wrap; gap:6px 16px; color:var(--ink-2); }
+.ie-legend i{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:0; }
+.ie-supp{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+.card.supp{ border-left:4px solid var(--good); }
+.card.supp > * + *{ margin-top:6px; }
+.supp-act{ display:flex; flex-wrap:wrap; gap:6px 18px; padding-top:4px; }
+.ie-ticks{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.ie-ticks li{ display:flex; gap:10px; align-items:flex-start; }
+.ie-ticks li .icon{ color:var(--good); margin-top:2px; }
+.ie-share .pill .icon{ width:14px; height:14px; }
+.ie-load{ height:6px; background:var(--surface-2); border-radius:3px; overflow:hidden; margin:8px 0; }
+.ie-load span{ display:block; height:100%; width:30%; background:var(--brand); animation:ieload 1.1s ease-in-out infinite; }
+@keyframes ieload{ from{ transform:translateX(-100%); } to{ transform:translateX(340%); } }
+@media (max-width:560px){ .ie-run, .ie-summary{ grid-template-columns:minmax(0,1fr); } .ie-run div, .ie-summary div{ flex-direction:row; justify-content:space-between; align-items:baseline; } .ie-inrow{ flex-wrap:wrap; } .ie-freq{ max-width:none; flex:1 1 100%; } }
+
+/* Benefits check */
+.bc-head{ display:flex; flex-direction:column; gap:6px; }
+.bc-head > b{ font-family:var(--font-display); font-size:clamp(1.7rem,2.4vw + .9rem,2.4rem); font-weight:600; line-height:1.1; color:var(--good); }
+.bc-head .row{ margin-top:8px; }
+.bc-item h3{ font-size:1.05rem; }
+.bc-cta{ display:flex; gap:16px 24px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.bc-cta > div{ flex:1 1 320px; }
+.bc-cta h2{ margin-bottom:4px; }
+
+/* Business collections portal: additions */
+[hidden]{ display:none !important; }
+.demand{ border-left:5px solid var(--brand); }
+.demand .amt{ font-family:var(--font-display); font-weight:600; font-size:clamp(2.2rem,4vw + 1rem,3.2rem); line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.deadline{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:3px; background:var(--fb-black); color:#fff; font-weight:600; font-size:.95rem; }
+.deadline .icon{ width:18px; height:18px; }
+.deadline.urgent{ background:var(--brand); }
+.deadline.over{ background:var(--crit); }
+.consq{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.consq > div{ background:var(--surface-2); border-radius:var(--r-s); padding:12px 14px; display:flex; flex-direction:column; gap:3px; }
+.consq b{ font-size:1.05rem; }
+.consq .xs{ color:var(--ink-3); }
+.opt.primary{ border-color:var(--brand); border-width:2px; background:var(--surface); }
+.opt.primary .ic{ background:var(--brand); color:#fff; }
+.opt.quiet{ border-style:dashed; min-height:0; }
+.opt.quiet .ic{ background:var(--surface-2); color:var(--ink-2); }
+.options.biz{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (max-width:760px){ .options.biz{ grid-template-columns:minmax(0,1fr); } }
+table.inv td.st{ white-space:nowrap; }
+.path{ list-style:none; margin:0; padding:0; display:grid; gap:0; counter-reset:p; }
+.path li{ display:grid; grid-template-columns:30px minmax(0,1fr); gap:12px; padding:10px 0; position:relative; counter-increment:p; }
+.path li::before{ content:counter(p); width:26px; height:26px; border-radius:50%; background:var(--surface-2); color:var(--ink); display:grid; place-items:center; font-weight:700; font-size:.8rem; border:2px solid var(--line); z-index:1; }
+.path li.now::before{ background:var(--brand); color:#fff; border-color:var(--brand); }
+.path li.done::before{ background:var(--fb-black); color:#fff; border-color:var(--fb-black); }
+.path li::after{ content:""; position:absolute; left:12px; top:36px; bottom:-10px; width:2px; background:var(--line); }
+.path li:last-child::after{ display:none; }
+.path .when{ font-size:.82rem; color:var(--ink-3); }
+.path b{ display:block; }
+.path .cost{ font-size:.85rem; color:var(--ink-2); }
+.chips.deposit .chip{ min-width:120px; text-align:center; }
+.plan-card .a{ font-size:1.35rem; }
+.status-pill{ display:inline-flex; align-items:center; gap:6px; }
+.rail-kv{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; font-size:.9rem; }
+.rail-kv dt{ color:var(--ink-3); }
+.rail-kv dd{ margin:0; font-weight:500; }
+.bank{ background:var(--surface-2); border-radius:var(--r-s); padding:12px 14px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 14px; font-size:.95rem; }
+.bank dt{ color:var(--ink-3); }
+.bank dd{ margin:0; font-variant-numeric:tabular-nums; font-weight:600; }
+.terms{ background:var(--surface-2); border-radius:var(--r-s); padding:12px 16px; font-size:.9rem; }
+.terms ul{ margin:6px 0 0; padding-left:18px; display:grid; gap:4px; }
+.ent-note{ font-size:.82rem; color:var(--ink-3); border:1px dashed var(--line); border-radius:6px; padding:4px 8px; display:inline-block; }
+.help-compact{ display:grid; gap:8px; }
+.help-compact div{ display:flex; gap:10px; align-items:flex-start; font-size:.92rem; }
+.help-compact .icon{ color:var(--ink-2); margin-top:2px; }
+.ie-ticks{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.ie-ticks li{ display:flex; gap:10px; align-items:flex-start; }
+.ie-ticks li .icon{ color:var(--good); margin-top:2px; }
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 15l2.5 2.5L16 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11m0-6a1.5 1.5 0 0 1 3 0v6m0-4.5a1.5 1.5 0 0 1 3 0V13m0-2a1.5 1.5 0 0 1 3 0v4a6 6 0 0 1-6 6h-1.6a6 6 0 0 1-4.9-2.5L4 14.6a1.6 1.6 0 0 1 2.5-2L7 13"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 3l7 3v6c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9.5 13h5M9.5 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 21V4m0 0h11l-1.5 3L16 10H5"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 9v6M14 9v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 7h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01M8.5 18h.01M12 18h.01M15.5 18h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#home" data-action="brand" aria-label="FB Collections business home">
+      <svg class="mark" viewBox="0 0 4 36" aria-hidden="true"><rect x="0" y="0" width="2.5" height="36" fill="var(--fb-red)"/></svg>
+      <span>FB Collections<small>Business collections</small></span>
+    </a>
+    <div class="top-actions">
+      <button class="btn ghost sm" data-action="textsize" id="textsize-btn" aria-pressed="false" title="Make the text bigger">Aa<span class="label"> Text size</span></button>
+      <a class="btn secondary sm" href="#contact"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg> Talk to a person</a>
+      <button class="btn ghost sm" data-action="signout" id="signout-btn" hidden>Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="subnav" id="subnav" hidden aria-label="Your account">
+  <div class="subnav-inner">
+    <a href="#home" data-nav="home">Home</a>
+    <a href="#account" data-nav="account">Invoices and account</a>
+    <a href="#pay" data-nav="pay">Pay</a>
+    <a href="#plan" data-nav="plan">Payment plan</a>
+    <a href="#dispute" data-nav="dispute">Dispute an invoice</a>
+    <a href="#support" data-nav="support">Help for your business</a>
+  </div>
+</nav>
+
+<main id="app" aria-live="polite"></main>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <div>
+      <h4>FB Collections</h4>
+      <ul>
+        <li><a href="#verify">Check a message is really from us</a></li>
+        <li><a href="#contact">Contact us</a></li>
+        <li><a href="#contact" data-action="goto-complain">How to complain</a></li>
+        <li><a href="#notme">This isn't our company</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Help for your business</h4>
+      <ul>
+        <li><a href="#support">Business Debtline and free advice</a></li>
+        <li><a href="#support" data-action="goto-micro">Your rights as a small business energy customer</a></li>
+        <li><a href="#difficulty">Tell us the business is in difficulty</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Your rights and your data</h4>
+      <ul>
+        <li><a href="#account" data-action="goto-rights">Who we are and who we act for</a></li>
+        <li><a href="#account" data-action="goto-rights">Privacy notice</a></li>
+        <li><a href="#account" data-action="goto-path">What happens if the balance stays unpaid</a></li>
+      </ul>
+    </div>
+    <div class="legal">
+      FB Collections Ltd is a company registered in England and Wales, company number [00000000], registered office [address]. FB Collections acts as agent for the organisation named on your account; the debt remains owned by that organisation. We are a member of the Credit Services Association and adhere to its Code of Practice [membership pending]. Registered with the Information Commissioner's Office, reference [ZA000000]. Business energy contracts are not regulated by the Consumer Credit Act; microbusiness customers have rights under Ofgem's rules and can use the Energy Ombudsman. Any legal action is taken by Flint Bishop LLP, solicitors, on the client's instruction, and you will be told in writing before it starts. <span class="proto-note">Prototype placeholders in brackets</span>
+    </div>
+  </div>
+</footer>
+
+<div class="demo" role="region" aria-label="Prototype controls">
+  <div class="demo-inner">
+    <span class="tag">Prototype v0.1 · Business</span>
+    <span class="hintx">Demo data. Nothing here is real or connected.</span>
+    <label>Scenario
+      <select id="scenario" aria-label="Demo scenario">
+        <option value="new">New notice</option>
+        <option value="plan">Plan in place</option>
+        <option value="missed">Plan payment missed</option>
+        <option value="hold">Invoice disputed, on hold</option>
+        <option value="lba">Letter before action sent</option>
+        <option value="paid">Paid</option>
+      </select>
+    </label>
+    <label>Customer
+      <select id="entity" aria-label="Customer type">
+        <option value="ltd">Limited company</option>
+        <option value="sole">Sole trader</option>
+      </select>
+    </label>
+    <label>Screen
+      <select id="jump" aria-label="Jump to a screen">
+        <option value="">Jump to…</option>
+        <option value="welcome">Public landing</option>
+        <option value="verify">Check it's really us</option>
+        <option value="signin">Sign in</option>
+        <option value="home">Home</option>
+        <option value="account">Invoices and account</option>
+        <option value="pay">Pay</option>
+        <option value="plan">Plan builder</option>
+        <option value="dispute">Dispute an invoice</option>
+        <option value="difficulty">Business in difficulty</option>
+        <option value="support">Help for your business</option>
+        <option value="contact">Talk to a person</option>
+      </select>
+    </label>
+    <button id="notes-btn" type="button" aria-pressed="false" title="Show the behavioural and regulatory rationale next to each element">Design rationale: off</button>
+    <span class="spacer"></span>
+    <button id="reset-btn" type="button">Reset demo</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-bg" id="modal-bg" aria-hidden="true"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<script>
+/* ============================================================
+   FB Collections business collections — prototype v0.1
+   The business version of the platform, for sole traders and small limited companies.
+   Same house style and plumbing as the customer portal; the journey is demand-led:
+   a dated deadline, pay in full first, a plan with an up-front payment and a short term,
+   consequences stated plainly, and a compact support route that stays part of the journey.
+   Vanilla JS. Hash routing. Demo data only. No back end.
+   ============================================================ */
+(function(){
+'use strict';
+
+/* ---------- Demo data (fictional) ---------- */
+const TODAY = new Date(2026, 9, 5); // Monday 5 October 2026 — fixed so the demo reads the same every day
+const BASE_RATE = 4.00; // Bank of England base rate, placeholder; statutory interest is 8% above it
+const ENTITIES = {
+  ltd: { kind:'ltd', name:'Oakfield Joinery Ltd', short:'Oakfield Joinery', legal:'a limited company', coNo:'11223344', status:'Active', inc:'14 March 2019',
+         contact:{ first:'Daniel', last:'Oakes', role:'Director', mobileEnd:'2290', emailMasked:'d•••••@oakfieldjoinery.co.uk' },
+         address:'Unit 4, Marsh Lane Industrial Estate, Crewe, CW1 •••', ref:'B7K4-2Q', you:'the company', your:"the company's", liable:'Oakfield Joinery Ltd is liable for the balance; directors are not personally liable unless they have given a guarantee.' },
+  sole:{ kind:'sole', name:'Daniel Oakes, trading as Oakfield Joinery', short:'Oakfield Joinery', legal:'a sole trader', coNo:null, status:null, inc:null,
+         contact:{ first:'Daniel', last:'Oakes', role:'Owner', mobileEnd:'2290', emailMasked:'d•••••@oakfieldjoinery.co.uk' },
+         address:'Unit 4, Marsh Lane Industrial Estate, Crewe, CW1 •••', ref:'B7K4-2Q', you:'you', your:'your', liable:'As a sole trader you are personally liable for the balance: it is a debt of yours, not of a separate company.' },
+};
+const DEMO = {
+  client: { name:'Westbridge Energy', short:'Westbridge', acct:'WB-4410 2271 09', type:'energy supplier', unit:'Westbridge Energy Business' },
+  account:{ supply:'Unit 4, Marsh Lane Industrial Estate, Crewe, CW1 •••', fuel:'Electricity and gas', contract:'Fixed-price business tariff, 24 months, ended 31 August 2026; now on out-of-contract rates', live:true,
+            placed:new Date(2026,8,29), noticeSent:new Date(2026,8,30), deadline:new Date(2026,9,14), lbaDate:new Date(2026,9,16), meterType:'Smart meter, read remotely' },
+  invoices:[
+    { no:'INV-0098231', period:'1 to 30 June 2026', issued:new Date(2026,6,3), due:new Date(2026,6,17), amount:1268.40 },
+    { no:'INV-0101877', period:'1 to 31 July 2026', issued:new Date(2026,7,4), due:new Date(2026,7,18), amount:1311.75 },
+    { no:'INV-0105402', period:'1 to 31 August 2026', issued:new Date(2026,8,3), due:new Date(2026,8,17), amount:1262.45 },
+  ],
+  handler:{ name:'Tom Ashworth', first:'Tom', initials:'TA', role:'Commercial collections specialist' },
+  rules:  { minInstalment:50, maxTermMonths:6, extTermMonths:12, depositPct:0.25, graceDays:7, disputeDays:10, holdDays:14, courtFee:205, fixedCosts:80, compensation:70 },
+  hours:  { chat:'Monday to Friday 8am to 6pm', phone:'0800 000 0000 (free from mobiles and landlines)', phoneHours:'Monday to Friday 8am to 6pm' },
+  customerPortal:'https://claude.ai/artifact/Nv4ajCZsT6U8TsKtkiibVD',
+};
+const TOTAL = Math.round(DEMO.invoices.reduce((t,i)=>t+i.amount,0)*100)/100;
+const TIMELINE = [
+  { when:new Date(2026,8,17), what:'Third invoice fell due', how:`${DEMO.client.name} reminder` },
+  { when:new Date(2026,8,22), what:`${DEMO.client.name} sent a final reminder`, how:'Email and letter' },
+  { when:new Date(2026,8,29), what:`${DEMO.client.name} passed the account to FB Collections`, how:'Placed' },
+  { when:new Date(2026,8,30), what:'Notice of overdue invoices, with a deadline of 14 October', how:'Letter and email to the registered office; text to the contact mobile' },
+  { when:new Date(2026,9,5),  what:'You signed in', how:'Online' },
+];
+
+/* ---------- State ---------- */
+const KEY = 'fbc-biz-v01';
+function defaultState(){
+  return {
+    signedIn:false, scenario:'new', entity:'ltd', notes:false, textLarge:false, signinStep:1,
+    plan:null, paid:false, hold:null, missed:false, lba:false, partial:0, dispute:null, difficulty:null,
+    draft:{ step:1, deposit:null, depositAmt:'', months:null, freq:'monthly', first:'', method:'', custom:'' },
+    payMode:'full', payOther:'', prefs:{ email:true, sms:true, letter:true, phone:true }, verifyTab:'email', lastRoute:'welcome', pendingRoute:null, scrollTo:null,
+  };
+}
+let S = load() || defaultState();
+function load(){ try{ const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function E(){ return ENTITIES[S.entity] || ENTITIES.ltd; }
+
+/* ---------- Utilities ---------- */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const gbp = n => '£' + (Math.round(n*100)/100).toLocaleString('en-GB',{minimumFractionDigits:2, maximumFractionDigits:2});
+const gbp0 = n => '£' + Math.round(n).toLocaleString('en-GB');
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtDate(d, opts){ if(typeof d==='string') d = /^\d{4}-\d{2}-\d{2}$/.test(d) ? fromISO(d) : new Date(d); return d.toLocaleDateString('en-GB', opts || {weekday:'long', day:'numeric', month:'long', year:'numeric'}); }
+const fmtShort = d => fmtDate(d, {day:'numeric', month:'short', year:'numeric'});
+const fmtDM = d => fmtDate(d, {day:'numeric', month:'long'});
+const fmtDMY = d => fmtDate(d, {day:'numeric', month:'long', year:'numeric'});
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function addMonths(d,n){ const x=new Date(d); const day=x.getDate(); x.setDate(1); x.setMonth(x.getMonth()+n); const last=new Date(x.getFullYear(), x.getMonth()+1, 0).getDate(); x.setDate(Math.min(day,last)); return x; }
+function daysBetween(a,b){ return Math.round((new Date(b).setHours(0,0,0,0) - new Date(a).setHours(0,0,0,0))/86400000); }
+function toISO(d){ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+function fromISO(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'), 3800); }
+function openModal(html){ $('#modal').innerHTML = html; $('#modal-bg').classList.add('open'); $('#modal-bg').setAttribute('aria-hidden','false'); const f=$('#modal').querySelector('button, [href], input'); if(f) f.focus(); }
+function closeModal(){ $('#modal-bg').classList.remove('open'); $('#modal-bg').setAttribute('aria-hidden','true'); }
+function icon(id, cls='icon'){ return `<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`; }
+function dn(text, cite){ return `<aside class="dn"><span class="tag">Why</span>${text}${cite?`<cite>${cite}</cite>`:''}</aside>`; }
+function stepsBar(n, total){ return `<div class="steps" aria-hidden="true">${Array.from({length:total},(_,i)=>`<span class="${i<n-1?'done':i===n-1?'now':''}"></span>`).join('')}</div>`; }
+let ROUTE = null;
+function currentHash(){ try{ return (location.hash||'#').slice(1); }catch(e){ return ''; } }
+function setHash(route){ try{ if(location.protocol==='about:') return; history.replaceState(null, '', '#'+route); }catch(e){} }
+function go(route){ ROUTE = route; setHash(route); render(); }
+
+/* ---------- Balance, late payment and deadline ---------- */
+function bal(){ return Math.round((TOTAL - (S.partial||0))*100)/100; }
+function deadline(){ return S.lba ? addDays(DEMO.account.lbaDate, E().kind==='sole' ? 30 : 14) : DEMO.account.deadline; }
+function daysLeft(){ return daysBetween(TODAY, deadline()); }
+function latePay(){ // Late Payment of Commercial Debts (Interest) Act 1998: 8% over base, plus a fixed sum per invoice
+  const rate = (8 + BASE_RATE)/100;
+  let interest = 0; DEMO.invoices.forEach(i => { const d = Math.max(0, daysBetween(i.due, TODAY)); interest += i.amount*rate*d/365; });
+  const perDay = bal()*rate/365;
+  const comp = DEMO.invoices.reduce((t,i)=> t + (i.amount<1000?40:i.amount<10000?70:100), 0);
+  return { rate:rate*100, interest:Math.round(interest*100)/100, perDay:Math.round(perDay*100)/100, comp };
+}
+function escalation(){ // what happens if nothing is agreed, by entity type
+  const e = E(), a = DEMO.account, r = DEMO.rules;
+  const steps = [
+    { t:'Notice of overdue invoices', when:fmtShort(a.noticeSent), d:`Sent to ${e.kind==='ltd'?'the registered office and the contact we hold':'you'}. Pay, agree a plan or raise a dispute by ${fmtDM(a.deadline)}.`, state:'done' },
+  ];
+  if(e.kind==='ltd'){
+    steps.push({ t:'Letter before action from Flint Bishop', when:`from ${fmtShort(a.lbaDate)}`, d:'Sets out the claim and gives 14 days to pay or respond. Statutory interest and compensation are claimed from this point.', state:S.lba?'now':'' });
+    steps.push({ t:'County Court claim', when:'14 days later', d:`A claim for the balance, interest, a court fee of about ${gbp0(r.courtFee)} and fixed costs of ${gbp0(r.fixedCosts)}, all added to what the company owes.`, cost:`Adds around ${gbp0(r.courtFee+r.fixedCosts)} before interest.` });
+    steps.push({ t:'Judgment (CCJ) against the company', when:'if not defended', d:'Recorded against the company for six years, visible to lenders, suppliers and credit insurers.' });
+    steps.push({ t:'Enforcement', when:'after judgment', d:`High Court enforcement officers, or a statutory demand and winding-up petition, which is available for any company debt of £750 or more. ${DEMO.client.short} can also apply to disconnect the supply at business premises.` });
+  } else {
+    steps.push({ t:'Letter of claim from Flint Bishop', when:`from ${fmtShort(a.lbaDate)}`, d:'Under the Pre-Action Protocol for Debt Claims: the claim, an information sheet and a reply form, with 30 days to respond. Statutory interest and compensation are claimed from this point.', state:S.lba?'now':'' });
+    steps.push({ t:'County Court claim', when:'30 days later', d:`A claim for the balance, interest, a court fee of about ${gbp0(r.courtFee)} and fixed costs of ${gbp0(r.fixedCosts)}, all added to what you owe.`, cost:`Adds around ${gbp0(r.courtFee+r.fixedCosts)} before interest.` });
+    steps.push({ t:'Judgment (CCJ) against you personally', when:'if not defended', d:'On your personal credit file for six years, affecting business and personal borrowing.' });
+    steps.push({ t:'Enforcement', when:'after judgment', d:`Enforcement agents, an attachment of earnings or a charging order. A bankruptcy petition needs a debt of £5,000 or more, so it does not apply to this balance on its own. ${DEMO.client.short} can also apply to disconnect the supply at business premises.` });
+  }
+  return steps;
+}
+
+/* ---------- Plan maths ---------- */
+const FREQ = { weekly:{label:'Every week', days:7, perMonth:52/12}, monthly:{label:'Every month', days:30.44, perMonth:1} };
+function stepDate(d, freq){ return freq==='monthly' ? addMonths(d,1) : addDays(d, FREQ[freq].days); }
+function planCalc(amount, freq, firstDate, balance){
+  amount = Math.round(Number(amount)*100)/100; if(!amount || amount<=0 || balance<=0) return null;
+  const n = Math.ceil(balance/amount - 1e-9);
+  const last = Math.round((balance - amount*(n-1))*100)/100;
+  const dates=[]; let d = firstDate ? new Date(firstDate) : addDays(TODAY,7);
+  for(let i=0;i<n;i++){ dates.push(new Date(d)); d = stepDate(d, freq); }
+  const months = n / FREQ[freq].perMonth;
+  return { amount, n, last, dates, end:dates[n-1], months, perMonth: amount*FREQ[freq].perMonth };
+}
+function depositMin(){ return Math.ceil(bal()*DEMO.rules.depositPct); }
+function samplePlan(){
+  const deposit = 960.65, first = new Date(2026,8,8), rest = Math.round((TOTAL-deposit)*100)/100;
+  const amt = Math.ceil(rest/5*100)/100; const p = planCalc(amt, 'monthly', first, rest);
+  return { deposit, depositDate:toISO(new Date(2026,8,1)), amount:amt, freq:'monthly', first:toISO(first), method:'dd', n:p.n, made:1, created:'2026-09-01', end:toISO(p.end), rest };
+}
+function planState(){
+  if(!S.plan) return null;
+  const rest = S.plan.rest != null ? S.plan.rest : Math.round((bal()-S.plan.deposit)*100)/100;
+  const p = planCalc(S.plan.amount, S.plan.freq, fromISO(S.plan.first), rest);
+  const made = S.plan.made||0;
+  const paidInst = Math.min(rest, made*S.plan.amount);
+  const next = p.dates[made] || null;
+  return { ...p, made, deposit:S.plan.deposit, paidTotal:Math.round((S.plan.deposit+paidInst)*100)/100, remaining:Math.round((rest-paidInst)*100)/100, next, method:S.plan.method, rest };
+}
+
+/* ---------- Views registry ---------- */
+const V = {};
+
+/* ============================================================
+   Views
+   ============================================================ */
+function deadlinePill(){
+  const n = daysLeft(); const d = deadline();
+  const cls = n<0?'over':n<=3?'urgent':'';
+  const txt = n<0 ? `Deadline passed: ${fmtDM(d)}` : n===0 ? `Respond today, ${fmtDM(d)}` : `Respond by ${fmtDate(d,{weekday:'long', day:'numeric', month:'long'})} · ${n} day${n===1?'':'s'}`;
+  return `<span class="deadline ${cls}">${icon('i-cal')}${txt}</span>`;
+}
+
+/* ---------- Public landing ---------- */
+V.welcome = () => `
+<div class="col stack-l fade" style="max-width:760px">
+  <div class="stack">
+    <p class="eyebrow">A notice from ${esc(DEMO.client.name)}, through FB Collections</p>
+    <h1>Unpaid invoices on a business energy account. Sign in to see them, pay, or agree a plan by the deadline.</h1>
+    <p class="lede">${esc(DEMO.client.name)} has asked us to collect overdue invoices on a business account. The notice we sent gives your reference and a date to respond by. Paying in full, agreeing a plan or raising a dispute before that date stops interest, costs and further action.</p>
+  </div>
+  <div class="card raised">
+    <div class="row between">
+      <div class="grow"><h2>Sign in with your reference</h2><p class="muted">On the notice we sent. Takes about a minute. You'll see each invoice, what's owed and the ways to settle it.</p></div>
+      <a class="btn" href="#signin">Sign in ${icon('i-arrow')}</a>
+    </div>
+    <hr class="sep">
+    <div class="row" style="gap:20px"><a href="#verify">Check this is really us</a><a href="#notme">This isn't our company</a><a href="#contact">Talk to a person</a></div>
+    ${dn(`The business front door is demand-led where the customer portal is solutions-led. The headline names the subject, the action and the deadline, because a business recipient needs to triage the message quickly and the deadline is the lever: dated deadlines move response more than general urgency. It is still not threatening: consequences are stated once, inside, with the routes that stop them.`, 'Late Payment of Commercial Debts (Interest) Act 1998; BIT deadline and specificity evidence; CSA Code')}
+  </div>
+  <div class="two">
+    <div class="card tint"><h3>Three things worth knowing</h3><ul class="stack-s" style="padding-left:18px;margin:0"><li>Pay in full and the matter closes the same day; ${esc(DEMO.client.short)} is told straight away.</li><li>If the business can't clear it in one go, a plan with a payment now and the rest over a few months can be agreed online, without a call.</li><li>If an invoice is wrong, you've left the premises, or the business is in difficulty, say so before the deadline and we hold the account while we look.</li></ul></div>
+    <div class="card"><h3>Free help for small businesses</h3><p class="muted">Business Debtline gives free, independent advice to sole traders and small companies. Talking to them doesn't affect your account with us.</p><div class="stack-s"><div><b>Business Debtline</b> <span class="num">0800 197 6026</span></div><div><b>Citizens Advice consumer service</b> <span class="num">0808 223 1133</span></div></div><a href="#support">All help and your rights</a></div>
+  </div>
+</div>`;
+
+/* ---------- Verify ---------- */
+V.verify = () => {
+  const tab = S.verifyTab || 'email';
+  const tabs = { email:'An email', letter:'A letter', text:'A text message', phone:'A phone call' };
+  const body = {
+    email: `<ul class="stack-s" style="padding-left:18px;margin:0"><li>Our emails come from an address ending <b>@fbcollections.co.uk</b>, are signed by a named person and quote your reference and ${esc(DEMO.client.name)}'s account number.</li><li>We never attach files you have to open to see the balance, and we never ask for card or bank details by reply.</li></ul>`,
+    letter: `<ul class="stack-s" style="padding-left:18px;margin:0"><li>Our letters carry our company number and registered office, your reference, and the supplier's invoice numbers so you can match them to your own records.</li><li>${esc(DEMO.client.name)} will also have written to say they have passed the account to us.</li></ul>`,
+    text: `<ul class="stack-s" style="padding-left:18px;margin:0"><li>Texts come from the sender name <b>FBCollect</b>, never a mobile number, and link only to <b>fbcollections.co.uk</b>.</li><li>We never ask for payment by text.</li></ul>`,
+    phone: `<ul class="stack-s" style="padding-left:18px;margin:0"><li>We say who is calling and why before asking anything, and never ask for payment on a call you didn't expect.</li><li>If anything feels off, hang up and call us back on <b class="num">0800 000 0000</b>.</li></ul>`,
+  }[tab];
+  return `<div class="col stack-l fade">
+    <div class="stack"><p class="eyebrow">Check it's really us</p><h1>Is this message really from FB Collections?</h1><p class="lede">Invoice fraud targets businesses, so it's sensible to check before you pay anything.</p></div>
+    <div class="card"><h2>What did you receive?</h2><div class="verify-tabs" role="tablist">${Object.entries(tabs).map(([k,v])=>`<button role="tab" aria-selected="${k===tab}" class="${k===tab?'on':''}" data-action="verify-tab" data-tab="${k}">${v}</button>`).join('')}</div><div class="stack-s">${body}</div></div>
+    <div class="two">
+      <div class="card tint"><h3>Check us independently</h3><ul class="stack-s" style="padding-left:18px;margin:0"><li>Look us up on <b>Companies House</b> (FB Collections Ltd, number [00000000]).</li><li>Check the <b>Credit Services Association</b> members' directory. [Membership pending]</li><li>Call <b>${esc(DEMO.client.name)}</b> on the number on one of your invoices, not a number in a message, and ask whether they've placed the account with us.</li><li><b>Never pay to new bank details</b> given in an email without checking by phone first.</li></ul></div>
+      <div class="card"><h3>Still not sure?</h3><p class="muted">Type <b>fbcollections.co.uk</b> into your browser yourself, or call us free on <b class="num">0800 000 0000</b>.</p><div class="row"><a class="btn secondary" href="#signin">Sign in from this page</a><a class="linkbtn" href="#notme">This isn't our company</a></div></div>
+    </div>
+  </div>`;
+};
+
+/* ---------- Sign in ---------- */
+V.signin = () => {
+  const e = E();
+  if(S.signinStep===2){
+    return `<div class="col stack-l fade" style="max-width:520px">
+      <div class="stack"><p class="eyebrow">Sign in · step 2 of 2</p><h1>Enter the 6-digit code we've just sent</h1><p class="lede">Texted to the mobile ending <b class="num">${e.contact.mobileEnd}</b>. Valid for 10 minutes.</p></div>
+      <form class="card raised stack" data-form="otp" novalidate>
+        <div class="otp" aria-label="One-time code">${[0,1,2,3,4,5].map(i=>`<input inputmode="numeric" maxlength="1" id="otp-${i}" aria-label="Digit ${i+1}" autocomplete="one-time-code">`).join('')}</div>
+        <p class="hint">Prototype: any six digits work, or <button type="button" class="linkbtn" data-action="otp-fill">fill it in for me</button>.</p>
+        <button class="btn block" type="submit">Continue</button>
+        <div class="link-row small"><button type="button" class="linkbtn" data-action="noop" data-msg="A new code would be sent here.">Send a new code</button><button type="button" class="linkbtn" data-action="noop" data-msg="Email fallback would be offered here.">Send it by email instead</button><button type="button" class="linkbtn" data-action="signin-back">Back</button></div>
+      </form>
+    </div>`;
+  }
+  return `<div class="col stack-l fade" style="max-width:520px">
+    <div class="stack"><p class="eyebrow">Sign in · step 1 of 2</p><h1>Find the account</h1><p class="lede">Your reference and ${e.kind==='ltd'?'the company number':'two details'} from the notice. No password to remember.</p></div>
+    <form class="card raised stack" data-form="signin" novalidate>
+      <div class="field"><label for="ref">Reference</label><input class="input num" id="ref" placeholder="e.g. B7K4-2Q" autocomplete="off"><p class="hint">On every letter, email or text from us.</p></div>
+      <div class="inline-fields">
+        ${e.kind==='ltd' ? `<div class="field"><label for="cono">Company number</label><input class="input num" id="cono" placeholder="8 digits" inputmode="numeric"></div>` : `<div class="field"><label for="cono">Your date of birth</label><input class="input" id="cono" placeholder="DD / MM / YYYY" inputmode="numeric"></div>`}
+        <div class="field"><label for="pc">Postcode of the supply address</label><input class="input" id="pc" placeholder="e.g. CW1 3XY" autocomplete="postal-code"></div>
+      </div>
+      <button class="btn block" type="submit">Continue</button>
+      <button class="btn ghost block" type="button" data-action="demo-fill">Use the demo account (${esc(e.short)})</button>
+      <div class="link-row small"><a href="#verify">Check this is genuine</a><a href="#notme">This isn't our company</a><a href="#contact">I can't sign in</a></div>
+      ${dn(`Identity for a business is the reference plus the company number (or date of birth for a sole trader) and the supply postcode, which are on the notice and on Companies House, so a director, bookkeeper or accountant can get in without an account. A one-time code goes to the mobile already on file. Authority to act is confirmed at the point of commitment, not at sign-in.`, 'CSA Code; Companies House; build blueprint §6')}
+    </form>
+  </div>`;
+};
+
+V.notme = () => `<div class="col stack-l fade" style="max-width:600px">
+  <div class="stack"><p class="eyebrow">This isn't our company</p><h1>Sorry we've reached the wrong business. Let's fix that.</h1><p class="lede">Tell us the reference and what applies, and we'll stop contact while we check with ${esc(DEMO.client.name)}.</p></div>
+  <form class="card raised stack" data-form="notme" novalidate>
+    <div class="field"><label for="nm-ref">Reference on the notice</label><input class="input num" id="nm-ref" placeholder="e.g. B7K4-2Q"></div>
+    <fieldset class="stack-s"><legend class="legend">What applies?</legend><div class="choices">
+      <label class="choice"><input type="radio" name="nm" value="never"><span class="t">We've never traded from the address or had an account with ${esc(DEMO.client.name)}</span></label>
+      <label class="choice"><input type="radio" name="nm" value="moved"><span class="t">We left the premises before the invoices were issued</span></label>
+      <label class="choice"><input type="radio" name="nm" value="name"><span class="t">Similar business name, but not us</span></label>
+      <label class="choice"><input type="radio" name="nm" value="dissolved"><span class="t">The company has been dissolved or is in an insolvency process</span></label>
+    </div></fieldset>
+    <button class="btn" type="submit">Stop contacting us</button>
+  </form>
+</div>`;
+
+/* ---------- Home ---------- */
+function handlerCard(){
+  return `<div class="card">
+    <div class="handler"><div class="avatar" aria-hidden="true">${DEMO.handler.initials}</div><div class="grow"><b>${DEMO.handler.name}</b> is handling this account.<br><span class="muted small">${DEMO.handler.role}. Replies within one working day.</span></div></div>
+    <div class="row"><a class="btn quiet sm" href="#contact">Message ${DEMO.handler.first}</a><a class="btn ghost sm" href="#contact">Ask for a call back</a></div>
+  </div>`;
+}
+function railCard(){
+  const e = E(), a = DEMO.account;
+  return `<div class="card stack">
+    <h3>The account</h3>
+    <dl class="rail-kv">
+      <dt>Customer</dt><dd>${esc(e.name)}</dd>
+      ${e.kind==='ltd'?`<dt>Company no.</dt><dd class="num">${e.coNo} <span class="pill good" style="margin-left:6px">${e.status}</span></dd>`:`<dt>Type</dt><dd>Sole trader</dd>`}
+      <dt>Supplier</dt><dd>${esc(DEMO.client.name)}</dd>
+      <dt>Account</dt><dd class="num">${DEMO.client.acct}</dd>
+      <dt>Supply</dt><dd>${a.live?'Live: still supplied':'Closed'}</dd>
+    </dl>
+    <p class="hint">${e.kind==='ltd'?'Company status checked against Companies House when the account was placed and again today.':'Sole trader accounts are treated as personal liabilities; the protections for individuals apply.'}</p>
+    ${dn(`A live Companies House check is the first control in business collections: a dissolved company, or one in administration or liquidation, must not be chased, and the status drives the escalation path shown on the account page. Sole traders are individuals in law, so the Pre-Action Protocol for Debt Claims, the £5,000 bankruptcy threshold and, where they qualify, Breathing Space all apply to them and not to companies.`, 'Companies House API; Insolvency Act 1986 ss.123, 267; Pre-Action Protocol for Debt Claims; Debt Respite Scheme Regulations 2020')}
+  </div>`;
+}
+function helpCompact(){
+  const e = E();
+  return `<div class="card tint">
+    <h3>Help for your business</h3>
+    <div class="help-compact">
+      <div>${icon('i-phone')}<span><b>Business Debtline</b> <span class="num">0800 197 6026</span><br><span class="muted small">Free, independent advice for sole traders and small companies.</span></span></div>
+      <div>${icon('i-shield')}<span><b>Small business rights</b><br><span class="muted small">Microbusinesses have extra protections under Ofgem's rules and can use the Energy Ombudsman. <a href="#support" data-action="goto-micro">Check if that's you</a>.</span></span></div>
+      <div>${icon('i-hand')}<span><b>Business in difficulty?</b><br><span class="muted small">Trading down, cash flow timing, ceased trading, or something personal${e.kind==='sole'?' affecting you':''}. <a href="#difficulty">Tell us</a> and we'll hold the account while we look.</span></span></div>
+    </div>
+    ${dn(`Support is scaled down, not removed: one card, three routes, on every signed-in screen. Business Debtline is the Money Advice Trust's free service for the self-employed and small businesses; Ofgem's microbusiness rules and the Ombudsman cover most of the target book; and the difficulty route keeps the sole trader's personal circumstances in scope, because a sole trader in difficulty is an individual in difficulty.`, 'Business Debtline; Ofgem microbusiness strategic review 2022 and SLC 7A; Energy Ombudsman small business scheme; CSA Code')}
+  </div>`;
+}
+function demandCard(){
+  const e = E(), lp = latePay(), n = daysLeft();
+  return `<div class="card raised demand">
+    <div class="row between" style="align-items:flex-start">
+      <div class="balance"><span class="eyebrow">Overdue to ${esc(DEMO.client.name)}</span><span class="amt num">${gbp(bal())}</span><span class="muted">${DEMO.invoices.length} unpaid invoices for ${DEMO.account.fuel.toLowerCase()} at ${esc(DEMO.account.supply)}. <a href="#account">See each invoice</a></span></div>
+      ${deadlinePill()}
+    </div>
+    <div class="consq">
+      <div><span class="xs">If unpaid after the deadline</span><b>Interest at ${lp.rate.toFixed(2)}% a year</b><span class="xs">${gbp(lp.interest)} to date, about ${gbp(lp.perDay)} a day. Frozen while a plan is kept.</span></div>
+      <div><span class="xs">Plus fixed compensation</span><b>${gbp(lp.comp)}</b><span class="xs">${gbp(DEMO.rules.compensation)} for each of the ${DEMO.invoices.length} invoices, under the Late Payment Act.</span></div>
+      <div><span class="xs">Then</span><b>${e.kind==='ltd'?'Letter before action':'Letter of claim'}</b><span class="xs">From Flint Bishop, solicitors, on ${fmtDM(DEMO.account.lbaDate)}. Court fees and costs follow. <a href="#account" data-action="goto-path">The full path</a>.</span></div>
+    </div>
+    <p class="small muted">Nothing is added if ${e.kind==='sole'?'you pay in full, agree a plan or raise a dispute':'the company pays in full, agrees a plan or raises a dispute'} by ${fmtDM(deadline())}.</p>
+    ${dn(`The demand is dialled up, and transparent: the exact balance, a dated deadline with a day count, and the three consequences the Late Payment Act and the client's terms allow (statutory interest at 8% over base, fixed compensation per invoice, and the legal path with its costs). Each is shown with the figure and the way to avoid it. Business customers respond to cost certainty; the customer portal deliberately keeps consequences behind a question because of the evidence on stress and comprehension for individuals, and that evidence does not transfer to a commercial debt.`, 'Late Payment of Commercial Debts (Interest) Act 1998 ss.4–5A; Late Payment Regulations 2002 and 2013; CPR 45 fixed costs; HMCTS civil fees')}
+  </div>`;
+}
+function optionsBlock(){
+  const e = E(), dep = depositMin();
+  return `<section class="stack">
+    <div><h2>Settle it now</h2><p class="muted">Paying in full is the quickest way to close this. If the business can't, a plan with a payment now and the rest over up to ${DEMO.rules.maxTermMonths} months can be agreed here.</p></div>
+    <div class="options biz">
+      <a class="opt primary" href="#pay"><span class="ic">${icon('i-card','')}</span><h3>Pay in full: ${gbp(bal())}</h3><p>Card, pay-by-bank or a bank transfer with your reference. The account closes the same day and nothing more is added.</p><span class="go">Pay now ${icon('i-arrow')}</span></a>
+      <a class="opt" href="#plan" data-action="plan-start"><span class="ic">${icon('i-cal','')}</span><h3>Pay ${gbp(dep)} now, the rest over up to ${DEMO.rules.maxTermMonths} months</h3><p>A quarter up front, then weekly or monthly instalments by Direct Debit. Interest and costs are frozen while the plan is kept.</p><span class="go">Set up a plan ${icon('i-arrow')}</span></a>
+      <a class="opt quiet" href="#dispute"><span class="ic">${icon('i-flag','')}</span><h3>Dispute an invoice</h3><p>Wrong readings, already paid, left the premises, contract or broker dispute. Upload evidence and we hold the account while ${esc(DEMO.client.short)} checks.</p><span class="go">Raise it ${icon('i-arrow')}</span></a>
+      <a class="opt quiet" href="#difficulty"><span class="ic">${icon('i-hand','')}</span><h3>The business is in difficulty</h3><p>Trading down, waiting on your own customers, ceased trading, an insolvency process${e.kind==='sole'?', or something personal':''}. Tell us and we'll hold the account while we look.</p><span class="go">Tell us ${icon('i-arrow')}</span></a>
+    </div>
+    ${dn(`Visual weight follows the client's priority order for commercial debt: pay in full first and emphasised, then a plan with an up-front payment, then the dispute and difficulty routes drawn lighter but never hidden. The up-front amount is stated as a figure because a concrete offer converts better than "set up a plan", and a deposit is standard commercial practice that also tests good faith early. The two quieter routes keep the support in the journey: a disputed or distressed account chased hard produces complaints, Ombudsman cases and bad debt, not cash.`, 'Burlando et al. 2025 on concrete offers; CSA Code; Ofgem microbusiness rules on disputes; Energy Ombudsman')}
+  </section>`;
+}
+function supplyNotice(){
+  if(!DEMO.account.live) return '';
+  return `<div class="notice">${icon('i-info')}<div><b>Your supply is still live.</b> These invoices are for past months. Ongoing usage is billed by ${esc(DEMO.client.short)} as normal and must be paid on time; any plan agreed here covers the arrears only. Keeping both up to date is a condition of the plan.</div></div>`;
+}
+function planCardHome(){
+  const p = planState(); if(!p) return '';
+  const total = p.rest + p.deposit;
+  return `<div class="card raised">
+    <div class="row between"><h2>Your plan</h2>${S.missed?'<span class="pill crit"><span class="dot"></span> Payment missed</span>':'<span class="pill good"><span class="dot"></span> On track</span>'}</div>
+    <dl class="kv">
+      <dt>Paid up front</dt><dd class="num">${gbp(p.deposit)}</dd>
+      <dt>Instalments made</dt><dd class="num">${p.made} of ${p.n}</dd>
+      <dt>Paid so far</dt><dd class="num">${gbp(p.paidTotal)}</dd>
+      <dt>Left to pay</dt><dd class="num total">${gbp(p.remaining)}</dd>
+    </dl>
+    <div class="bar-h" role="img" aria-label="${Math.round(p.paidTotal/total*100)}% paid"><i style="width:${Math.min(100,p.paidTotal/total*100).toFixed(1)}%"></i></div>
+    ${S.missed ? '' : `<div class="notice">${icon('i-cal')}<div>Next instalment <b>${gbp(p.amount)}</b> on <b>${p.next?fmtDate(p.next):'—'}</b> by ${p.method==='dd'?'Direct Debit':'the saved card'}. ${FREQ[S.plan.freq].label}, clears by ${fmtShort(p.end)}. Interest and costs stay frozen while every payment is made.</div></div>`}
+    <div class="row"><a class="btn secondary sm" href="#pay">Pay extra or settle early</a><button class="btn ghost sm" data-action="move-payment">Move the next payment</button><a class="btn ghost sm" href="#contact">Talk to ${DEMO.handler.first}</a></div>
+    ${dn(`Progress is shown, as in the customer portal, because it predicts completion. The controls are narrower: one move of up to 7 days, no pause, and changes to the amount go through ${DEMO.handler.first}, because a commercial plan is a negotiated settlement of a liquidated sum rather than an affordability arrangement.`, 'Gal & McShane 2012; CSA Code; client forbearance rules placeholder')}
+  </div>`;
+}
+function faqBlock(){
+  const e = E();
+  return `<section class="stack"><h2>Questions businesses ask</h2><div>
+    <details class="acc"><summary>Why are we hearing from FB Collections and not ${esc(DEMO.client.name)}?</summary><div class="body"><p>${esc(DEMO.client.name)} has passed the overdue invoices to us to collect on their behalf. They still own the debt and still supply you. Queries about meter readings or the contract itself can still go to them, and we'll pass a dispute on for you.</p></div></details>
+    <details class="acc"><summary>Can interest and compensation really be added?</summary><div class="body"><p>Yes. Business-to-business invoices carry statutory interest at 8% above the Bank of England base rate under the Late Payment of Commercial Debts (Interest) Act 1998, plus a fixed sum per invoice (£40, £70 or £100 depending on its size), unless the contract sets different terms. ${esc(DEMO.client.short)} has chosen not to add them if the balance is settled or a plan is agreed by ${fmtDM(deadline())}.</p></div></details>
+    <details class="acc"><summary>Will this affect ${e.kind==='ltd'?"the company's":'my'} credit record?</summary><div class="body"><p>${e.kind==='ltd'?'Agreeing a plan and keeping to it does not create a County Court judgment. A judgment is only possible if a claim is issued and not paid or defended, and it then stays on the company\'s record for six years.':'Agreeing a plan and keeping to it does not create a County Court judgment. As a sole trader, a judgment would be against you personally and would sit on your personal credit file for six years.'} ${esc(DEMO.client.short)} may report the account's status to commercial credit agencies as part of its normal reporting.</p></div></details>
+    <details class="acc"><summary>Can the supply be disconnected?</summary><div class="body"><p>Business premises do not have the same protection from disconnection as homes. ${esc(DEMO.client.short)} can apply for a warrant to disconnect for unpaid invoices after notice, though in practice it is a last resort and does not happen while a plan is kept or a dispute is open. If the premises are also someone's home, tell us: different rules apply.</p></div></details>
+    <details class="acc"><summary>What if ${e.kind==='ltd'?'the company is insolvent or about to be':'I can\'t pay at all'}?</summary><div class="body"><p>${e.kind==='ltd'?'Tell us. If the company is in administration, liquidation or a CVA, collection stops and the claim goes to the insolvency practitioner. If it is about to be, Business Debtline can advise the directors on their options and duties.':'Tell us. Business Debtline can advise on all your business and personal debts for free, and if you are not VAT-registered a debt adviser may be able to include business debts in a Breathing Space, which pauses enforcement for 60 days.'} <a href="#difficulty">Start here</a>.</p></div></details>
+  </div></section>`;
+}
+V.home = () => {
+  const e = E(), name = e.contact.first;
+  const head = (h1, lede) => `<div class="stack"><p class="eyebrow">${esc(e.name)} · ref ${e.ref}</p><h1>${h1}</h1>${lede?`<p class="lede">${lede}</p>`:''}</div>`;
+  if(S.paid){
+    return `<div class="wide fade"><div class="grid-2"><div class="stack-l">
+      ${head(`Settled. Thank you, ${name}.`, `The ${gbp(TOTAL)} owed to ${esc(DEMO.client.name)} is paid in full and this matter is closed. We've told ${esc(DEMO.client.short)} today; no interest, compensation or costs apply.`)}
+      <div class="banner good"><h2>What happens now</h2><p>A settlement confirmation goes to the contact email within five working days. Keep it with ${e.your} records. ${esc(DEMO.client.short)} continues to supply the premises as normal.</p><div class="row"><button class="btn secondary sm" data-action="noop" data-msg="Settlement confirmation would open here as a PDF.">View the settlement confirmation</button></div></div>
+      ${handlerCard()}
+    </div><aside class="stack">${railCard()}${helpCompact()}</aside></div></div>`;
+  }
+  if(S.hold){
+    const h = S.hold;
+    return `<div class="wide fade"><div class="grid-2"><div class="stack-l">
+      ${head(`${name}, the account is on hold until ${fmtDMY(h.until)}.`, `Nothing is expected until then and the deadline is paused. No interest or costs are added while a dispute or difficulty is being looked at.`)}
+      <div class="banner info"><h2>Why it's on hold</h2><p>${esc(h.reason)}</p><p>${esc(h.next)}</p></div>
+      <div class="card"><h3>In the meantime</h3><p class="muted">The balance stays at ${gbp(bal())}. You can still pay any part of it, or agree a plan for the part that isn't disputed; many businesses do, to keep the matter moving.</p><div class="row"><a class="btn secondary sm" href="#pay">Pay the undisputed part</a><a class="btn ghost sm" href="#account">See the invoices</a></div></div>
+      ${handlerCard()}
+    </div><aside class="stack">${railCard()}${helpCompact()}</aside></div></div>`;
+  }
+  if(S.plan){
+    const p = planState();
+    return `<div class="wide fade"><div class="grid-2"><div class="stack-l">
+      ${head(S.missed ? `${name}, the instalment on ${fmtDM(p.next)} wasn't received.` : `${name}, the plan is on track.`, S.missed ? `Pay it within ${DEMO.rules.graceDays} days, by <b>${fmtDMY(addDays(p.next, DEMO.rules.graceDays))}</b>, and the plan continues. If it isn't, the plan ends, the full ${gbp(p.remaining)} becomes payable at once, and interest and costs are added from today.` : '')}
+      ${S.missed ? `<div class="banner crit"><h2>What to do now</h2><div class="row"><button class="btn sm" data-action="retry-payment">Pay the ${gbp(p.amount)} now</button><button class="btn secondary sm" data-action="move-payment">Move it by up to ${DEMO.rules.graceDays} days</button><a class="btn ghost sm" href="#difficulty">Something's changed in the business</a><a class="btn ghost sm" href="#contact">Talk to ${DEMO.handler.first}</a></div>
+        ${dn(`A missed instalment on a commercial plan is treated as a breach with a short cure period, stated plainly with the date and the consequence, because the plan is a negotiated settlement and the client's terms say so. The difficulty route stays one tap away, so a business whose own customers have paid late can say so before the plan collapses. This is the main tonal difference from the customer portal, where a missed payment is "a question, not an escalation".`, 'Client plan terms placeholder; CSA Code; Business Debtline')}</div>` : ''}
+      ${planCardHome()}
+      ${supplyNotice()}
+      ${handlerCard()}
+    </div><aside class="stack">${railCard()}${helpCompact()}</aside></div></div>`;
+  }
+  if(S.lba){
+    const e2 = E();
+    return `<div class="wide fade"><div class="grid-2"><div class="stack-l">
+      ${head(`${name}, a ${e2.kind==='ltd'?'letter before action':'letter of claim'} was sent on ${fmtDMY(DEMO.account.lbaDate)}.`, `The deadline on the notice passed without a payment, plan or dispute, so ${esc(DEMO.client.name)} has instructed Flint Bishop, solicitors. You still have until <b>${fmtDMY(deadline())}</b> to pay or agree a plan and stop a court claim. ${e2.kind==='sole'?'The letter came with an information sheet and a reply form; you can also respond here.':''}`)}
+      <div class="banner crit"><h2>Now owed: ${gbp(bal())}, plus statutory interest and compensation</h2><p>Interest of ${gbp(latePay().interest)} to date and ${gbp(latePay().comp)} compensation are now claimed. If a claim is issued, a court fee of about ${gbp0(DEMO.rules.courtFee)} and fixed costs of ${gbp0(DEMO.rules.fixedCosts)} are added, and a judgment would follow if it isn't paid or defended.</p><div class="row"><a class="btn sm" href="#pay">Pay in full now</a><a class="btn secondary sm" href="#plan" data-action="plan-start">Agree a plan</a><a class="btn ghost sm" href="#dispute">Dispute the claim</a>${e2.kind==='sole'?`<a class="btn ghost sm" href="#support">Get free advice first</a>`:''}</div></div>
+      ${optionsBlock()}
+      ${handlerCard()}
+    </div><aside class="stack">${railCard()}${helpCompact()}</aside></div></div>`;
+  }
+  // new notice
+  return `<div class="wide fade"><div class="grid-2"><div class="stack-l">
+    ${head(`${name}, ${gbp(bal())} is overdue to ${esc(DEMO.client.name)}. Respond by ${fmtDate(deadline(),{weekday:'long', day:'numeric', month:'long'})}.`, `Three invoices for ${DEMO.account.fuel.toLowerCase()} at ${esc(DEMO.account.supply)} are unpaid, the oldest since July. ${esc(DEMO.client.short)} has asked us to collect them. Pay in full, agree a plan or raise a dispute before the deadline and nothing is added.`)}
+    ${demandCard()}
+    ${optionsBlock()}
+    ${supplyNotice()}
+    ${handlerCard()}
+    ${faqBlock()}
+  </div><aside class="stack">${railCard()}${helpCompact()}</aside></div></div>`;
+};
+
+/* ---------- Invoices and account ---------- */
+V.account = () => {
+  const e = E(), a = DEMO.account, cl = DEMO.client, lp = latePay();
+  const pref = S.prefs;
+  const tog = (id,label,d) => `<label class="choice ${pref[id]?'on':''}"><input type="checkbox" data-pref="${id}" ${pref[id]?'checked':''}><span><span class="t">${label}</span>${d?`<br><span class="d">${d}</span>`:''}</span></label>`;
+  const steps = escalation();
+  return `<div class="col stack-l fade" style="max-width:860px">
+    <div class="stack"><p class="eyebrow">${esc(e.name)} · ref ${e.ref}</p><h1>Invoices and account</h1><p class="lede">Each invoice, what has been sent, what happens if the balance stays unpaid, and how we keep in touch.</p></div>
+    <section class="card" id="sec-inv">
+      <h2>The invoices</h2>
+      <div class="tscroll"><table class="tbl inv"><thead><tr><th>Invoice</th><th>Period</th><th>Issued</th><th>Due</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>
+        ${DEMO.invoices.map(i=>`<tr><td class="num">${i.no}</td><td>${i.period}</td><td>${fmtShort(i.issued)}</td><td>${fmtShort(i.due)}</td><td class="num">${gbp(i.amount)}</td><td class="st"><span class="pill crit">${daysBetween(i.due,TODAY)} days overdue</span></td></tr>`).join('')}
+        ${S.partial?`<tr><td colspan="4">Payment to FB Collections, ${fmtShort(TODAY)}</td><td class="num">− ${gbp(S.partial)}</td><td></td></tr>`:''}
+        <tr><td colspan="4"><b>Balance now</b></td><td class="num"><b>${gbp(bal())}</b></td><td></td></tr>
+      </tbody></table></div>
+      <dl class="rail-kv" style="margin-top:14px">
+        <dt>Supplier</dt><dd>${esc(cl.name)}</dd><dt>Account number</dt><dd class="num">${cl.acct}</dd><dt>Supply address</dt><dd>${esc(a.supply)}</dd><dt>Contract</dt><dd>${esc(a.contract)}</dd><dt>Meter</dt><dd>${esc(a.meterType)}</dd><dt>Passed to FB Collections</dt><dd>${fmtShort(a.placed)}</dd>
+      </dl>
+      <div class="row"><button class="btn ghost sm" data-action="noop" data-msg="The invoice PDFs would open here.">${icon('i-doc')} Invoice PDFs</button><button class="btn ghost sm" data-action="noop" data-msg="A statement of account in CSV would download here, for your accounts package.">${icon('i-doc')} Statement (CSV)</button><a class="btn secondary sm" href="#dispute">Dispute an invoice</a></div>
+      ${dn(`Invoice-level detail with issue and due dates, days overdue and a downloadable statement, because a business matches collection demands to its own ledger before it pays, and a bookkeeper is often the person on this screen. Mismatched or unverifiable demands are the leading cause of non-payment and of complaints in B2B collections.`, 'CSA Code; competitor teardown; Ofgem microbusiness rules on billing accuracy')}
+    </section>
+    <section class="card" id="sec-path">
+      <h2>What happens if the balance stays unpaid</h2>
+      <p class="muted">${esc(e.liable)} Each step below is avoidable by paying, agreeing a plan or raising a dispute before it is reached.</p>
+      <ol class="path">${steps.map(s=>`<li class="${s.state||''}"><div><b>${esc(s.t)}</b><span class="when">${esc(s.when)}</span><div class="small">${esc(s.d)}</div>${s.cost?`<div class="cost">${esc(s.cost)}</div>`:''}</div></li>`).join('')}</ol>
+      <div class="consq" style="margin-top:12px">
+        <div><span class="xs">Statutory interest</span><b>${lp.rate.toFixed(2)}% a year</b><span class="xs">8% above base rate (${BASE_RATE.toFixed(2)}%). ${gbp(lp.interest)} accrued to date.</span></div>
+        <div><span class="xs">Fixed compensation</span><b>${gbp(lp.comp)}</b><span class="xs">Per invoice: £40 under £1,000, £70 to £9,999.99, £100 from £10,000.</span></div>
+        <div><span class="xs">Court fee and fixed costs if a claim is issued</span><b>about ${gbp0(DEMO.rules.courtFee+DEMO.rules.fixedCosts)}</b><span class="xs">At current HMCTS fees and CPR fixed costs; recovered from ${e.you}.</span></div>
+      </div>
+      <p class="hint">Legal action is taken by Flint Bishop LLP on ${esc(cl.short)}'s instruction and you are told in writing before it starts. Figures are at current rates and change if the rates do.</p>
+      ${dn(`The escalation path differs by entity, and the page says so: a company gets a letter before action and 14 days, a statutory demand and winding-up are available from £750, and the judgment attaches to the company; a sole trader gets the Pre-Action Protocol letter of claim with 30 days, a reply form and the information sheet, a bankruptcy petition only from £5,000, and the judgment on their personal file. Showing the costs with the figures is the cheapest deterrent available and avoids the "we didn't know it would cost that" complaint after the event.`, 'Pre-Action Protocol for Debt Claims (individuals and sole traders only); Insolvency Act 1986 s.123(1)(a) and s.267(4); CPR 45; HMCTS fees; Ofgem disconnection rules for non-domestic premises')}
+    </section>
+    <section class="card"><h2>What we've sent</h2><ul class="tl">${TIMELINE.map(t=>`<li><div><div>${esc(t.what)}</div><div class="when">${fmtShort(t.when)} · ${esc(t.how)}</div></div></li>`).join('')}</ul></section>
+    <section class="card" id="sec-prefs">
+      <h2>How we keep in touch</h2>
+      <p class="muted">Notices go to the registered office${e.kind==='ltd'?'':' address'} by post as well as the contact we hold. Choose the other channels that suit the business.</p>
+      <div class="choices cols">${tog('email','Email','')}${tog('sms','Text message','To the contact mobile')}${tog('letter','Letter','Always, for formal notices')}${tog('phone','Phone calls','Office hours')}</div>
+      <div class="row"><button class="btn ghost sm" data-action="noop" data-msg="Contact changes would be captured here: a new contact name, role, email and mobile, confirmed by a code.">Change the contact for this account</button><a class="btn ghost sm" href="#contact" data-action="goto-third">Our accountant or adviser is handling this</a></div>
+    </section>
+    <section class="card" id="sec-rights">
+      <h2>Who we are, and your rights</h2>
+      <div class="stack-s">
+        <p><b>Who is acting.</b> FB Collections Ltd acts as agent for ${esc(cl.name)}, who own the debt. We are not a law firm. If ${esc(cl.short)} instructs legal action, it is taken by Flint Bishop LLP, solicitors, and you are told in writing first.</p>
+        <p><b>Business customers.</b> This is a business-to-business debt, so the Consumer Credit Act and the FCA's rules for individuals do not apply. ${e.kind==='sole'?'As a sole trader, the Pre-Action Protocol for Debt Claims and the protections for individuals do apply to you, and Business Debtline can advise on business and personal debts together.':'Microbusinesses have rights under Ofgem\'s rules, including on billing disputes and switching, and can take an unresolved complaint about the supplier to the Energy Ombudsman.'} <a href="#support" data-action="goto-micro">Your rights in full</a>.</p>
+        <p><b>Your data.</b> We hold what ${esc(cl.name)} gave us, what Companies House publishes, and what you tell us. You can ask for a copy or correct it at any time.</p>
+        <p><b>Complaints.</b> Tell ${DEMO.handler.first} or any of us and we stop recovery activity while we look into it. Complaints about our conduct can go to the Credit Services Association; complaints about the invoices or the supply go to ${esc(cl.name)}, and then to the Energy Ombudsman if you are eligible. <a href="#contact" data-action="goto-complain">How to complain</a>.</p>
+      </div>
+    </section>
+  </div>`;
+};
+
+/* ---------- Pay ---------- */
+V.pay = () => {
+  const e = E(), ps = planState(), owed = ps ? ps.remaining : bal();
+  return `<div class="col stack-l fade" style="max-width:640px">
+    <div class="stack"><p class="eyebrow">Pay</p><h1>Pay ${gbp(owed)} to close this</h1><p class="lede">Pay in full and the matter closes today. Pay part now if you intend to agree a plan for the rest: at least ${gbp(depositMin())} is needed to start one.</p></div>
+    <form class="card raised stack" data-form="pay" novalidate>
+      <fieldset class="stack-s"><legend class="legend">How much?</legend>
+        <label class="choice ${S.payMode!=='other'?'on':''}"><input type="radio" name="paymode" value="full" ${S.payMode!=='other'?'checked':''}><span><span class="t">Pay in full: ${gbp(owed)}</span><br><span class="d">Closes the account today. No interest, compensation or costs. ${esc(DEMO.client.short)} is told straight away.</span></span></label>
+        <label class="choice ${S.payMode==='other'?'on':''}"><input type="radio" name="paymode" value="other" ${S.payMode==='other'?'checked':''}><span class="grow"><span class="t">Pay part now</span><br><span class="d">Then set up a plan for the rest before the deadline, or interest and costs apply to what's left.</span><div class="money" style="margin-top:8px;max-width:220px"><input class="input num" id="pay-other" inputmode="decimal" placeholder="${depositMin()}.00" value="${esc(S.payOther||'')}" aria-label="Amount to pay"></div></span></label>
+      </fieldset>
+      <fieldset class="stack-s"><legend class="legend">How?</legend>
+        <label class="choice"><input type="radio" name="paymethod" value="bank"><span><span class="t">Pay by bank</span><br><span class="d">Approve it in the business banking app. No card details, no fees, arrives instantly.</span></span></label>
+        <label class="choice"><input type="radio" name="paymethod" value="card"><span><span class="t">Business or personal debit card</span><br><span class="d">Entered on a secure page. Credit cards accepted; no surcharge.</span></span></label>
+        <label class="choice"><input type="radio" name="paymethod" value="transfer"><span><span class="t">Bank transfer (BACS or Faster Payments)</span><br><span class="d">For your accounts team. Use the reference exactly, so it lands on the right account.</span>
+          <dl class="bank" style="margin-top:8px"><dt>Payee</dt><dd>FB Collections Ltd client account</dd><dt>Sort code</dt><dd>[00-00-00]</dd><dt>Account</dt><dd>[00000000]</dd><dt>Reference</dt><dd>${e.ref}</dd></dl><span class="d">Takes up to one working day to show here. Tell us when it's sent and we'll note it.</span></span></label>
+      </fieldset>
+      <button class="btn block" type="submit">Continue to payment</button>
+      <p class="hint">You'll see a summary and confirm before any money moves. A VAT receipt and remittance are emailed to the contact address.</p>
+      ${dn(`Full payment first, with the figure, because asking "can you clear it in full?" first raises full payment; part payment is framed as the start of a plan with the minimum stated, not as a way to buy time. A bank transfer with the reference and a remittance is offered because that is how many businesses pay, and the bank details are shown on the signed-in page only, never in email, which is the invoice-fraud control.`, 'FCA OP42/43 (full-balance-first evidence); UK Finance invoice fraud guidance; build blueprint §8')}
+    </form>
+  </div>`;
+};
+
+/* ---------- Plan builder ---------- */
+function nextDateSuggestion(){ return addDays(TODAY, 7); }
+V.plan = () => {
+  const e = E();
+  if(S.plan && !S.changingPlan){
+    const p = planState();
+    return `<div class="col stack-l fade">
+      <div class="stack"><p class="eyebrow">Payment plan</p><h1>The plan</h1><p class="lede">${gbp(p.deposit)} paid up front on ${fmtShort(fromISO(S.plan.depositDate))}, then ${gbp(p.amount)} ${FREQ[S.plan.freq].label.toLowerCase()} by ${p.method==='dd'?'Direct Debit':'saved card'}, clearing by ${fmtShort(p.end)}.</p></div>
+      ${planCardHome()}
+      <div class="card"><h3>Schedule</h3><div class="tscroll"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>
+        <tr><td class="num">–</td><td>${fmtShort(fromISO(S.plan.depositDate))}</td><td class="num">${gbp(p.deposit)}</td><td><span class="pill good">Paid up front</span></td></tr>
+        ${p.dates.map((d,i)=>`<tr><td class="num">${i+1}</td><td>${fmtShort(d)}</td><td class="num">${gbp(i===p.n-1?p.last:p.amount)}</td><td>${i<p.made?'<span class="pill good">Paid</span>':(i===p.made&&S.missed)?'<span class="pill crit">Missed</span>':i===p.made?'<span class="pill brand">Next</span>':'<span class="pill">Scheduled</span>'}</td></tr>`).join('')}
+      </tbody></table></div></div>
+      <div class="terms"><b>Terms of the plan</b><ul><li>Each instalment must be received on or before its date. One instalment can be moved by up to ${DEMO.rules.graceDays} days.</li><li>If an instalment is missed and not paid within ${DEMO.rules.graceDays} days, the plan ends, the full balance becomes payable, and statutory interest and compensation are added from that date.</li><li>Ongoing supply must be paid to ${esc(DEMO.client.short)} on time.</li><li>Interest and compensation are waived once the final instalment is received.</li></ul></div>
+      <div class="row"><a class="btn secondary sm" href="#pay">Settle early</a><a class="btn ghost sm" href="#contact">Ask ${DEMO.handler.first} to change the plan</a></div>
+    </div>`;
+  }
+  const d = S.draft, step = d.step||1, dep = depositMin();
+  if(step===1){
+    const depAmt = d.deposit==='other' ? Number(String(d.depositAmt).replace(/[^0-9.]/g,''))||0 : d.deposit==='half' ? Math.ceil(bal()*0.5) : dep;
+    const rest = Math.max(0, Math.round((bal()-depAmt)*100)/100);
+    const first = nextDateSuggestion();
+    const opts = [ [2,'2 months'], [3,'3 months'], [6,`${DEMO.rules.maxTermMonths} months`] ].map(([m,l]) => { const amt = Math.ceil(rest/m*100)/100; const p = planCalc(amt,'monthly',first,rest); return p ? {...p, m, l} : null; }).filter(Boolean);
+    return `<div class="col stack-l fade" style="max-width:680px">
+      <div class="stack"><p class="eyebrow">Set up a plan · step 1 of 3</p>${stepsBar(1,3)}<h1>A payment now, then the rest over up to ${DEMO.rules.maxTermMonths} months</h1><p class="lede">Plans for business accounts start with an up-front payment of at least a quarter of the balance. Choose how much now, and how quickly the rest is cleared.</p></div>
+      <form class="card raised stack" data-form="plan1" novalidate>
+        <fieldset class="stack-s"><legend class="legend">Pay now</legend>
+          <div class="chips deposit">
+            <button type="button" class="chip ${d.deposit==='min'||!d.deposit?'on':''}" data-action="dep-pick" data-v="min">${gbp0(dep)}<br><span class="small">a quarter</span></button>
+            <button type="button" class="chip ${d.deposit==='half'?'on':''}" data-action="dep-pick" data-v="half">${gbp0(Math.ceil(bal()*0.5))}<br><span class="small">half</span></button>
+            <button type="button" class="chip ${d.deposit==='other'?'on':''}" data-action="dep-pick" data-v="other">Another amount<br><span class="small">at least ${gbp0(dep)}</span></button>
+          </div>
+          <div class="money" style="max-width:220px" id="dep-wrap" ${d.deposit==='other'?'':'hidden'}><input class="input num" id="dep-amt" inputmode="decimal" placeholder="${dep}.00" value="${esc(d.depositAmt)}" aria-label="Up-front amount"></div>
+          <p class="hint">Taken today by card or pay-by-bank, or by bank transfer within 3 working days.</p>
+        </fieldset>
+        <fieldset class="stack-s"><legend class="legend">Then the remaining ${gbp(rest)}</legend>
+          <div class="plan-cards" role="radiogroup" aria-label="Term options">
+            ${opts.map(p=>`<button type="button" class="plan-card ${d.months===p.m?'on':''}" data-action="term-pick" data-m="${p.m}" role="radio" aria-checked="${d.months===p.m}"><span class="d">Over ${p.l}</span><span class="a">${gbp(p.amount)}</span><span class="d">a month · ${p.n} payments · done by ${fmtDate(p.end,{month:'short', year:'numeric'})}</span></button>`).join('')}
+          </div>
+          <div class="field"><label for="custom">Or a monthly amount of your own <span class="muted">(clears within ${DEMO.rules.maxTermMonths} months)</span></label><div class="money" style="max-width:220px"><input class="input num" id="custom" inputmode="decimal" placeholder="0.00" value="${esc(d.custom)}" aria-label="Custom monthly amount"></div><p class="hint" id="custom-hint"></p></div>
+          <label class="check"><input type="radio" name="freq" value="monthly" ${d.freq!=='weekly'?'checked':''}><span>Monthly instalments</span></label>
+          <label class="check"><input type="radio" name="freq" value="weekly" ${d.freq==='weekly'?'checked':''}><span>Weekly instalments, the same total each month</span></label>
+        </fieldset>
+        <div class="notice">${icon('i-info')}<div>Need longer than ${DEMO.rules.maxTermMonths} months? Up to ${DEMO.rules.extTermMonths} can be agreed with ${DEMO.handler.first} where the business shows why, for example management accounts or a cash-flow forecast. <a href="#difficulty">Tell us about the business</a> or <a href="#contact">talk to ${DEMO.handler.first}</a>.</div></div>
+        <div class="row between"><a class="btn ghost" href="#home">${icon('i-back')} Back</a><button class="btn" type="submit">Continue</button></div>
+        ${dn(`The commercial plan is term-led, not affordability-led: an up-front payment of at least 25%, then the balance over 2, 3 or 6 months, with 12 by exception and evidence. There is no income and expenditure check and no "what could you manage" question, because a liquidated commercial debt is settled on the client's terms; the difficulty route is where a business that genuinely cannot meet them goes. The presets anchor on the client's preferred terms, and weekly instalments are offered because many small traders are paid weekly.`, 'Client plan terms placeholder; CSA Code; Incekara-Hafalir et al. 2026 on presets; Business Debtline practice')}
+      </form>
+    </div>`;
+  }
+  if(step===2){
+    const first = d.first ? fromISO(d.first) : nextDateSuggestion();
+    const p = draftPlan(first);
+    return `<div class="col stack-l fade" style="max-width:640px">
+      <div class="stack"><p class="eyebrow">Set up a plan · step 2 of 3</p>${stepsBar(2,3)}<h1>How and when</h1><p class="lede">Instalments are collected automatically. The first one is due within 14 days of the up-front payment.</p></div>
+      <form class="card raised stack" data-form="plan2" novalidate>
+        <div class="field"><label for="first">First instalment date</label><input class="input" type="date" id="first" value="${toISO(first)}" min="${toISO(addDays(TODAY,1))}" max="${toISO(addDays(TODAY,14))}" style="max-width:240px"><p class="hint">Within 14 days. Later instalments follow ${d.freq==='weekly'?'weekly':'monthly'} from that date.</p></div>
+        ${p ? `<div class="notice">${icon('i-cal')}<div><b>${gbp(p.deposit)} now</b>, then <b>${p.n} instalments of ${gbp(p.amount)}</b>${p.last!==p.amount?` (the last one ${gbp(p.last)})`:''}, ${FREQ[d.freq].label.toLowerCase()}, from ${fmtDate(first)}. Clears by <b>${fmtDMY(p.end)}</b>. Total ${gbp(bal())}; nothing added while the plan is kept.</div></div>`:''}
+        <fieldset class="stack-s"><legend class="legend">Collected by</legend><div class="choices">
+          <label class="choice ${d.method==='dd'?'on':''}"><input type="radio" name="method" value="dd" ${d.method==='dd'?'checked':''}><span><span class="t">Direct Debit from the business account</span><br><span class="d">Set up now with the account holder's authority. Covered by the Direct Debit Guarantee.</span></span></label>
+          <label class="choice ${d.method==='card'?'on':''}"><input type="radio" name="method" value="card" ${d.method==='card'?'checked':''}><span><span class="t">Card, taken automatically on each date</span><br><span class="d">Business or personal debit or credit card.</span></span></label>
+        </div><p class="hint">Instalments are not collected manually on a business plan; a plan that depends on remembering to pay is the one that breaks.</p></fieldset>
+        <div class="row between"><button class="btn ghost" type="button" data-action="plan-back">${icon('i-back')} Back</button><button class="btn" type="submit">Check and confirm</button></div>
+      </form>
+    </div>`;
+  }
+  const first = d.first ? fromISO(d.first) : nextDateSuggestion();
+  const p = draftPlan(first);
+  return `<div class="col stack-l fade" style="max-width:640px">
+    <div class="stack"><p class="eyebrow">Set up a plan · step 3 of 3</p>${stepsBar(3,3)}<h1>Check and agree</h1><p class="lede">Nothing is set up until you confirm. The up-front payment is taken next.</p></div>
+    <form class="card raised stack" data-form="plan3" novalidate>
+      <dl class="kv">
+        <dt>Up front, today</dt><dd class="num">${gbp(p.deposit)}</dd>
+        <dt>Then each instalment</dt><dd class="num">${gbp(p.amount)}</dd>
+        <dt>How often</dt><dd>${FREQ[d.freq].label}</dd>
+        <dt>Number of instalments</dt><dd class="num">${p.n}${p.last!==p.amount?` (last one ${gbp(p.last)})`:''}</dd>
+        <dt>First instalment</dt><dd>${fmtDMY(first)}</dd>
+        <dt>Last instalment</dt><dd>${fmtDMY(p.end)}</dd>
+        <dt>Collected by</dt><dd>${d.method==='dd'?'Direct Debit':'card, automatically'}</dd>
+        <span class="line"></span>
+        <dt><b>Total</b></dt><dd class="total num">${gbp(bal())}</dd>
+        <dt>Interest and compensation</dt><dd class="num">Waived if kept</dd>
+      </dl>
+      <div class="terms"><b>Terms</b><ul><li>Each instalment must be received on or before its date. One instalment can be moved by up to ${DEMO.rules.graceDays} days, once.</li><li>If an instalment is missed and not paid within ${DEMO.rules.graceDays} days, the plan ends, the remaining balance becomes payable in full, and statutory interest and compensation are added from that date.</li><li>Ongoing supply charges must be paid to ${esc(DEMO.client.short)} on time; the plan covers the arrears only.</li><li>${e.kind==='ltd'?'This agreement is made on behalf of '+esc(e.name)+' by a person authorised to bind it.':'This agreement is made by you personally as the sole trader.'}</li></ul></div>
+      <label class="check"><input type="checkbox" id="affirm"><span>${e.kind==='ltd'?`I am authorised to agree this on behalf of ${esc(e.name)}, and the company will keep to it.`:'I agree to these terms and will keep to the plan.'}</span></label>
+      <div class="row between"><button class="btn ghost" type="button" data-action="plan-back">${icon('i-back')} Back</button><button class="btn" type="submit">Agree the plan and pay ${gbp(p.deposit)}</button></div>
+      ${dn(`The confirmation is a short set of commercial terms and an authority statement, which is what makes the plan enforceable if it fails and what the client's credit team expects to see. Positive friction is kept (unticked box, full summary) but the questions a consumer asks ("what if I miss one?") are answered in the terms rather than softened.`, 'Client plan terms placeholder; CSA Code; Companies Act 2006 s.40 (authority of directors); FCA digital design review on pre-ticked boxes, applied by analogy')}
+    </form>
+  </div>`;
+};
+function draftPlan(first){
+  const d = S.draft, dep = depositMin();
+  const depAmt = d.deposit==='other' ? Math.max(dep, Number(String(d.depositAmt).replace(/[^0-9.]/g,''))||0) : d.deposit==='half' ? Math.ceil(bal()*0.5) : dep;
+  const rest = Math.max(0, Math.round((bal()-depAmt)*100)/100);
+  let monthly = d.custom ? Number(String(d.custom).replace(/[^0-9.]/g,''))||0 : d.months ? Math.ceil(rest/d.months*100)/100 : 0;
+  if(!monthly) return null;
+  const amt = d.freq==='weekly' ? Math.ceil(monthly/FREQ.weekly.perMonth*100)/100 : monthly;
+  const p = planCalc(amt, d.freq, first, rest); if(!p) return null;
+  return { ...p, deposit:Math.round(depAmt*100)/100, rest };
+}
+
+/* ---------- Dispute ---------- */
+V.dispute = () => {
+  const e = E();
+  const reasons = [ ['readings','The amount is wrong: estimated readings or the wrong meter','We\'ll ask '+DEMO.client.short+' to re-bill from your readings or the smart meter data.'], ['paid','We\'ve already paid some or all of it','Give the dates and amounts, and we\'ll check with '+DEMO.client.short+'.'], ['moved','We left the premises, or weren\'t responsible for all of this period','Dates and proof of the move, such as a lease end or sale completion.'], ['contract','We dispute the contract, the rates or how it was sold','For example a broker dispute, or out-of-contract rates applied wrongly.'], ['insolvency', e.kind==='ltd'?'The company is in an insolvency process':'I\'m in a formal debt solution or Breathing Space', e.kind==='ltd'?'Administration, liquidation or a CVA. Collection stops and the claim goes to the insolvency practitioner.':'An IVA, bankruptcy, a DRO or Breathing Space. Enforcement stops while we check the register.'], ['other','Something else',''] ];
+  const r = S.disputeDraft||{};
+  return `<div class="col stack-l fade" style="max-width:680px">
+    <div class="stack"><p class="eyebrow">Dispute an invoice</p><h1>Tell us what's wrong</h1><p class="lede">The account is held for ${DEMO.rules.disputeDays} working days while ${esc(DEMO.client.short)} checks. No interest or costs are added during a dispute raised before the deadline. Pay any part that isn't disputed if you can; it keeps the matter smaller.</p></div>
+    <form class="card raised stack" data-form="dispute" novalidate>
+      <fieldset class="stack-s"><legend class="legend">Which invoices?</legend><div class="chips">${DEMO.invoices.map(i=>`<button type="button" class="chip ${(r.inv||[]).includes(i.no)?'on':''}" data-action="disp-inv" data-no="${i.no}" aria-pressed="${(r.inv||[]).includes(i.no)}">${i.no} · ${gbp(i.amount)}</button>`).join('')}<button type="button" class="chip ${(r.inv||[]).includes('all')?'on':''}" data-action="disp-inv" data-no="all" aria-pressed="${(r.inv||[]).includes('all')}">All of them</button></div></fieldset>
+      <fieldset class="stack-s"><legend class="legend">What's the problem?</legend><div class="choices">${reasons.map(([v,t,dd])=>`<label class="choice ${r.reason===v?'on':''}"><input type="radio" name="reason" value="${v}" ${r.reason===v?'checked':''}><span><span class="t">${t}</span>${dd?`<br><span class="d">${dd}</span>`:''}</span></label>`).join('')}</div></fieldset>
+      <div class="field"><label for="disp-text">Details <span class="muted">(dates, readings, amounts, who you spoke to)</span></label><textarea class="input" id="disp-text" placeholder="As much as you can. It goes straight to ${esc(DEMO.client.short)} with the hold.">${esc(r.text||'')}</textarea></div>
+      <div class="field"><label>Evidence <span class="muted">(optional, but it speeds things up)</span></label><div class="row"><button type="button" class="btn ghost sm" data-action="noop" data-msg="File upload: meter photos, readings, bank statements, lease, broker contract, insolvency notice.">${icon('i-doc')} Upload files</button><span class="hint">Meter photos, readings, bank statements, lease, broker contract, insolvency notice.</span></div></div>
+      <button class="btn" type="submit">Raise the dispute and hold the account</button>
+      ${dn(`Disputes are invoice-specific and evidence-first, because the fix is usually a re-bill from actual readings or a change-of-occupier correction, and Ofgem's microbusiness rules require suppliers to deal with billing disputes within set timescales. An insolvency process is a reason on the list because it must stop collection at once. The "pay the undisputed part" prompt keeps cash moving without prejudicing the dispute.`, 'Ofgem SLC 7A and microbusiness strategic review; Insolvency Act 1986 moratoria; CSA Code; CPR Practice Direction on pre-action conduct')}
+    </form>
+  </div>`;
+};
+
+/* ---------- Business in difficulty (compact support route) ---------- */
+V.difficulty = () => {
+  const e = E(); const d = S.difficultyDraft||{};
+  const opts = [
+    ['cashflow','Cash flow timing: our own customers are paying late','A plan with a first instalment up to 30 days out, and the up-front payment reduced where it helps.'],
+    ['trading','Trading is down and the business can\'t meet the standard terms','A longer plan, up to '+DEMO.rules.extTermMonths+' months, with something to show why. '+DEMO.handler.first+' will call.'],
+    ['ceased','The business has stopped trading, or is about to','Tell us when and what is happening to it, so the right route is used and you are not chased for something that is being dealt with properly.'],
+    ['insolvency', e.kind==='ltd'?'The company is entering administration, liquidation or a CVA':'I\'m taking advice about bankruptcy, an IVA or Breathing Space', e.kind==='ltd'?'Collection stops and we deal with the insolvency practitioner.':'Collection pauses while you take advice. Business Debtline can advise on business and personal debts together.'],
+    ['personal', e.kind==='sole'?'Something personal: illness, bereavement, caring, or a very difficult time':'The director or owner is dealing with something personal', e.kind==='sole'?'You are an individual as well as a business. We adjust how we work with you, hold the account, and point you to the right help.':'Tell us what would help: a different contact, more time, or someone else to deal with us.'],
+  ];
+  if(S.difficulty){
+    return `<div class="col stack-l fade" style="max-width:640px">
+      <div class="stack"><p class="eyebrow">The business is in difficulty</p><h1>Thank you. The account is on hold until ${fmtDMY(S.hold.until)}.</h1><p class="lede">${DEMO.handler.name} has it and will call the contact number within two working days to agree what happens next. No interest or costs are added while it's on hold.</p></div>
+      <div class="card raised stack"><h3>What you told us</h3><p>${esc(opts.find(o=>o[0]===S.difficulty.reason)?.[1]||'')}</p>${S.difficulty.text?`<p class="muted small">"${esc(S.difficulty.text)}"</p>`:''}<div class="row"><a class="btn" href="#home">Back to the account</a><button class="btn ghost" data-action="diff-edit">Change it</button></div></div>
+      ${S.difficulty.reason==='personal' && e.kind==='sole' ? `<div class="two"><div class="card tint"><h3>Free advice that knows this territory</h3><p class="muted small">Business Debtline for the business side; StepChange or National Debtline for everything else. <a href="#support">See the list</a>.</p></div><div class="card tint"><h3>If things feel too much</h3><p class="muted small">Samaritans, free, any time: <b>116 123</b>.</p></div></div>` : `<div class="card tint"><h3>Free advice</h3><p class="muted small">Business Debtline, 0800 197 6026, advises sole traders and small companies for free, including on insolvency options and directors' duties. <a href="#support">All help</a>.</p></div>`}
+    </div>`;
+  }
+  return `<div class="col stack-l fade" style="max-width:680px">
+    <div class="stack"><p class="eyebrow">The business is in difficulty</p><h1>Tell us what's happening</h1><p class="lede">One question. The account goes on hold for ${DEMO.rules.holdDays} days while we work out the right route with you, and nothing is added in that time.</p></div>
+    <form class="card raised stack" data-form="difficulty" novalidate>
+      <div class="choices">${opts.map(([v,t,dd])=>`<label class="choice ${d.reason===v?'on':''}"><input type="radio" name="dreason" value="${v}" ${d.reason===v?'checked':''}><span><span class="t">${t}</span><br><span class="d">${dd}</span></span></label>`).join('')}</div>
+      <div class="field"><label for="diff-text">Anything else we should know? <span class="muted">(optional)</span></label><textarea class="input" id="diff-text" placeholder="In your own words.">${esc(d.text||'')}</textarea></div>
+      <div class="row between"><a class="btn ghost" href="#home">${icon('i-back')} Back</a><button class="btn" type="submit">Send and hold the account</button></div>
+      ${dn(`The support offering, scaled to a business book: one screen, five situations, a ${DEMO.rules.holdDays}-day hold and a named call. Each situation maps to a concrete commercial response (a later first date, a longer term with evidence, the cessation route, the insolvency route) rather than to a welfare journey. The exception is the sole trader with a personal difficulty, who is an individual in law and in fact, so the customer portal's disclosure principles apply: hold, adjust, signpost, and never a worse outcome for telling us.`, 'CSA Code; Business Debtline; FCA FG21/1 applied to sole traders by analogy; Insolvency Act 1986')}
+    </form>
+  </div>`;
+};
+
+/* ---------- Help for your business (compact) ---------- */
+V.support = () => {
+  const e = E();
+  return `<div class="col stack-l fade" style="max-width:860px">
+    <div class="stack"><p class="eyebrow">Help for your business</p><h1>Free advice, and your rights as a business energy customer</h1><p class="lede">Shorter than the list we give householders, because the help that matters for a business is specific. Using any of it never counts against you with us.</p></div>
+    <div class="two">
+      <div class="card"><h3>Business Debtline</h3><p class="muted small">Free, confidential, independent advice for sole traders and small businesses on all business debts, from the Money Advice Trust. Covers time-to-pay, insolvency options and directors' duties.</p><div class="ct"><b class="num">0800 197 6026</b><br><span class="muted small">Mon–Fri 9am–8pm</span></div><div class="row"><a class="btn secondary sm" href="https://www.businessdebtline.org" target="_blank" rel="noopener">Visit website</a><button class="btn ghost sm" data-action="warm-referral">Ask them to call me</button></div></div>
+      <div class="card"><h3>Citizens Advice consumer service</h3><p class="muted small">Free advice about a business energy bill, contract or supplier, including how to complain and whether you can go to the Ombudsman.</p><div class="ct"><b class="num">0808 223 1133</b><br><span class="muted small">Mon–Fri 9am–5pm</span></div><div class="row"><a class="btn secondary sm" href="https://www.citizensadvice.org.uk/consumer/energy/" target="_blank" rel="noopener">Visit website</a></div></div>
+    </div>
+    <section class="card" id="sec-micro">
+      <h2>Your rights as a small business energy customer</h2>
+      <p>If the business has fewer than 10 employees and a turnover or balance sheet of no more than €2 million, or uses no more than 100,000 kWh of electricity or 293,000 kWh of gas a year, it is a <b>microbusiness</b> under Ofgem's rules. That gives you:</p>
+      <ul class="ie-ticks">
+        <li>${icon('i-check')}<span><b>Clear, accurate bills</b> and a process for billing disputes, with the supplier expected to resolve them promptly and to re-bill from actual readings.</span></li>
+        <li>${icon('i-check')}<span><b>The Energy Ombudsman</b>, free, if ${esc(DEMO.client.short)} hasn't resolved a complaint within eight weeks or has sent a deadlock letter. Small businesses with fewer than 50 employees can also use it.</span></li>
+        <li>${icon('i-check')}<span><b>Information about brokers</b>, including what commission was paid, and the right to a contract that was sold fairly.</span></li>
+        <li>${icon('i-check')}<span><b>Protection from unfair back-billing</b>: charges for energy used more than 12 months ago that weren't billed at the time can't usually be recovered.</span></li>
+      </ul>
+      <p class="hint">Disconnection: business premises are not protected in the way homes are, but it is a last resort and does not happen while a dispute is open or a plan is kept. If the premises are also a home, different rules apply: tell us.</p>
+      ${dn(`Most of the target book is microbusinesses, and Ofgem's 2022 strategic review gave them rights that bear directly on collections: billing accuracy and dispute handling, broker transparency, the back-billing limit and Ombudsman access, extended in 2024 to small businesses. Stating them on the agent's own site is unusual and is the business equivalent of the customer portal's Breathing Space page: it pre-empts the complaint by answering it.`, 'Ofgem Microbusiness Strategic Review decision 2022; SLC 7A, 7B; Ofgem back-billing rules for non-domestic customers; Energy Ombudsman eligibility 2024')}
+    </section>
+    ${e.kind==='sole' ? `<section class="card"><h2>Because you're a sole trader</h2><p class="muted">Your business debts are your personal debts. That cuts both ways: a judgment would be against you personally, but the protections for individuals apply. A free debt adviser can look at business and personal debts together, and if you're not VAT-registered may be able to include business debts in a <b>Breathing Space</b>, which pauses enforcement on all your debts for 60 days.</p><div class="stack-s small"><div><b>StepChange</b> · <span class="num">0800 138 1111</span></div><div><b>National Debtline</b> · <span class="num">0808 808 4000</span></div></div></section>` : ''}
+    <section class="card"><h2>Time to pay, properly</h2><p class="muted">If the standard terms don't work, say so before the deadline rather than after. A longer plan can be agreed where the business shows why, and an adviser's proposal carries weight with ${esc(DEMO.client.short)}. <a href="#difficulty">Tell us the business is in difficulty</a>.</p></section>
+  </div>`;
+};
+
+/* ---------- Talk to a person ---------- */
+V.contact = () => {
+  const e = E();
+  const slots = ['Today, 2pm to 4pm','Tomorrow, 9am to 11am','Tomorrow, 11am to 1pm','Tomorrow, 2pm to 4pm','Choose another time'];
+  return `<div class="col stack-l fade" style="max-width:860px">
+    <div class="stack"><p class="eyebrow">Talk to a person</p><h1>Reach ${DEMO.handler.first}, or anyone on the commercial team</h1><p class="lede">Office hours, real people. Your accountant, bookkeeper or adviser can deal with us for the business.</p></div>
+    <div class="two">
+      <div class="card"><div class="row"><span class="opt-ic">${icon('i-chat')}</span><h3>Live chat</h3></div><p class="muted small">${DEMO.hours.chat}. Usually answered within two minutes.</p><div class="row"><button class="btn sm" data-action="noop" data-msg="Live chat with a human agent opens here.">Start a chat</button></div></div>
+      <div class="card"><div class="row"><span class="opt-ic">${icon('i-phone')}</span><h3>Call us, free</h3></div><p class="muted small"><b class="num" style="font-size:1.15rem">0800 000 0000</b><br>${DEMO.hours.phoneHours}.</p><div class="row"><button class="btn ghost sm" data-action="copy" data-copy="0800 000 0000">Copy number</button></div></div>
+    </div>
+    <form class="card raised stack" data-form="callback" novalidate id="sec-callback">
+      <h2>Ask for a call back</h2>
+      <p class="muted">Pick a time and we'll call the mobile ending <b class="num">${e.contact.mobileEnd}</b>, or a different number if you tell us.</p>
+      <div class="choices cols">${slots.map((s,i)=>`<label class="choice"><input type="radio" name="slot" value="${i}"><span class="t">${s}</span></label>`).join('')}</div>
+      <div class="field"><label for="cb-note" class="small">Anything we should know first? <span class="muted">(optional)</span></label><input class="input" id="cb-note" placeholder="e.g. ask for our bookkeeper, Sam"></div>
+      <button class="btn" type="submit">Request a call back</button>
+    </form>
+    <div class="two">
+      <form class="card stack" data-form="message" novalidate><h3>Send a secure message</h3><p class="muted small">Goes to ${DEMO.handler.first}. Reply within one working day.</p><textarea class="input" id="msg-text" placeholder="Write your message"></textarea><button class="btn secondary sm" type="submit">Send message</button></form>
+      <div class="card stack" id="sec-third"><h3>Someone acting for the business?</h3><p class="muted small">An accountant, bookkeeper, adviser or insolvency practitioner can deal with us. Tell us who, and what they may agree. We confirm with the account holder before acting on anything they ask.</p><div class="row"><button class="btn secondary sm" data-action="noop" data-msg="Third-party authority: name, firm, role, what they may do, confirmed with the account holder.">Add someone who can act for us</button></div></div>
+    </div>
+    <section class="card" id="sec-complain">
+      <h2>How to complain</h2>
+      <p class="muted">Tell ${DEMO.handler.first} or anyone on the team. We stop recovery activity while we look into it, acknowledge within two working days and aim to give a full answer within four weeks, never more than eight. Complaints about our conduct can be referred to the <b>Credit Services Association</b>. Complaints about the invoices or the supply go to ${esc(DEMO.client.name)}, and then to the <b>Energy Ombudsman</b> if the business is eligible and they haven't resolved it within eight weeks.</p>
+      <div class="row"><button class="btn secondary sm" data-action="noop" data-msg="Complaint form (what happened, what you'd like to happen) would capture here; recovery pauses on submission.">Make a complaint</button></div>
+    </section>
+  </div>`;
+};
+
+/* ============================================================
+   Routing and rendering
+   ============================================================ */
+const PUBLIC = new Set(['welcome','verify','signin','notme','contact','support']);
+function routeFromHash(){ const raw = ROUTE!=null ? ROUTE : currentHash(); const r = String(raw).replace(/[^a-z-]/g,''); return r || (S.signedIn?'home':'welcome'); }
+function render(){
+  let r = routeFromHash();
+  if(!V[r]) r = S.signedIn ? 'home' : 'welcome';
+  if(!PUBLIC.has(r) && !S.signedIn){ S.pendingRoute = r; r = 'signin'; }
+  if(r==='welcome' && S.signedIn) r = 'home';
+  S.lastRoute = r; save();
+  $('#app').innerHTML = V[r]();
+  document.title = 'FB Collections Business Collections';
+  $('#subnav').hidden = !S.signedIn;
+  $('#signout-btn').hidden = !S.signedIn;
+  $$('#subnav a').forEach(a => { const nav = a.dataset.nav; const on = nav===r || (nav==='support' && r==='difficulty'); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  $('#scenario').value = S.scenario; $('#entity').value = S.entity; $('#jump').value = '';
+  document.body.classList.toggle('notes', !!S.notes);
+  const nb = $('#notes-btn'); nb.textContent = 'Design rationale: ' + (S.notes?'on':'off'); nb.classList.toggle('on', !!S.notes); nb.setAttribute('aria-pressed', String(!!S.notes));
+  document.documentElement.toggleAttribute('data-text', S.textLarge); if(S.textLarge) document.documentElement.setAttribute('data-text','large');
+  $('#textsize-btn').setAttribute('aria-pressed', String(!!S.textLarge));
+  afterRender(r);
+  if(S.scrollTo){ const el = document.getElementById(S.scrollTo); S.scrollTo = null; save(); if(el){ setTimeout(()=>el.scrollIntoView({behavior:'smooth', block:'start'}), 30); return; } }
+  window.scrollTo({top:0, behavior:'instant'});
+}
+function afterRender(r){
+  if(r==='plan'){
+    const dep = $('#dep-amt'); if(dep){ dep.addEventListener('input', e => { S.draft.depositAmt = e.target.value; save(); refreshTerms(); }); }
+    const custom = $('#custom'); if(custom){ custom.addEventListener('input', e => { S.draft.custom = e.target.value; S.draft.months = null; save(); $$('.plan-card').forEach(c=>{ c.classList.remove('on'); c.setAttribute('aria-checked','false'); }); customHint(); }); customHint(); }
+    const first = $('#first'); if(first){ first.addEventListener('change', e => { S.draft.first = e.target.value; save(); render(); }); }
+  }
+  if(r==='signin' && S.signinStep===2){ const inputs = $$('.otp input'); inputs.forEach((inp,i)=>{ inp.addEventListener('input', ()=>{ inp.value = inp.value.replace(/\D/g,'').slice(-1); if(inp.value && inputs[i+1]) inputs[i+1].focus(); }); inp.addEventListener('keydown', e=>{ if(e.key==='Backspace' && !inp.value && inputs[i-1]) inputs[i-1].focus(); }); }); if(inputs[0]) inputs[0].focus(); }
+  if(r==='account'){ $$('[data-pref]').forEach(i => i.addEventListener('change', e => { S.prefs[e.target.dataset.pref] = e.target.checked; save(); e.target.closest('.choice')?.classList.toggle('on', e.target.checked); toast('Saved.'); })); }
+  $$('.choice input').forEach(i => i.addEventListener('change', () => { const group = i.name ? $$(`input[name="${i.name}"]`) : [i]; group.forEach(g => g.closest('.choice')?.classList.toggle('on', g.checked)); if(i.name==='paymode'){ S.payMode = i.value; save(); } if(i.name==='method'){ S.draft.method = i.value; save(); } if(i.name==='reason'){ S.disputeDraft = {...(S.disputeDraft||{}), reason:i.value}; save(); } if(i.name==='dreason'){ S.difficultyDraft = {...(S.difficultyDraft||{}), reason:i.value}; save(); } }));
+  $$('input[name="freq"]').forEach(i => i.addEventListener('change', () => { S.draft.freq = i.value; save(); customHint(); }));
+}
+function refreshTerms(){ /* re-render step 1 keeping focus on the deposit box */ const active = document.activeElement && document.activeElement.id; $('#app').innerHTML = V.plan(); afterRender('plan'); if(active){ const el = document.getElementById(active); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } } }
+function customHint(){
+  const h = $('#custom-hint'); if(!h) return; const d = S.draft; const v = Number(String(d.custom||'').replace(/[^0-9.]/g,''))||0;
+  if(!v){ h.textContent = ''; return; }
+  const p = draftPlan(nextDateSuggestion());
+  if(!p){ h.textContent=''; return; }
+  const tooLong = p.months > DEMO.rules.maxTermMonths + 0.01;
+  const tooSmall = v < DEMO.rules.minInstalment;
+  h.textContent = tooSmall ? `The minimum instalment is ${gbp(DEMO.rules.minInstalment)}.` : tooLong ? `${gbp(v)} a month would take about ${Math.ceil(p.months)} months. Up to ${DEMO.rules.maxTermMonths} can be agreed here; longer needs ${DEMO.handler.first}.` : `${p.n} instalments of ${gbp(p.amount)}${d.freq==='weekly'?' a week':''}, done by ${fmtDate(p.end,{month:'long', year:'numeric'})}.`;
+  h.style.color = (tooSmall||tooLong) ? 'var(--crit)' : '';
+}
+
+/* ============================================================
+   Actions
+   ============================================================ */
+function applyScenario(sc){
+  S.scenario = sc; S.plan=null; S.paid=false; S.hold=null; S.missed=false; S.lba=false; S.partial=0; S.dispute=null; S.difficulty=null; S.changingPlan=false;
+  if(sc==='plan'){ S.plan = samplePlan(); }
+  if(sc==='missed'){ S.plan = samplePlan(); S.missed = true; }
+  if(sc==='hold'){ S.hold = { reason:`You disputed invoice INV-0101877 (July) on the grounds that the readings were estimated, so we've asked ${DEMO.client.name} to re-bill from the smart meter data.`, next:`We expect their answer within ${DEMO.rules.disputeDays} working days and will message the contact as soon as we have it. The deadline on the notice is paused.`, until:toISO(addDays(TODAY,14)) }; S.dispute = { reason:'readings', inv:['INV-0101877'], when:toISO(TODAY) }; }
+  if(sc==='lba'){ S.lba = true; }
+  if(sc==='paid'){ S.paid = true; }
+  S.signedIn = true; save();
+}
+function signIn(){ S.signedIn = true; S.signinStep = 1; const to = S.pendingRoute && S.pendingRoute!=='signin' ? S.pendingRoute : 'home'; S.pendingRoute=null; save(); go(to); toast(`Signed in as ${E().contact.first} ${E().contact.last}, ${E().contact.role.toLowerCase()}${E().kind==='ltd'?', '+E().name:''}.`); }
+const ACTIONS = {
+  brand(){ go(S.signedIn ? 'home' : 'welcome'); },
+  textsize(){ S.textLarge = !S.textLarge; save(); render(); },
+  signout(){ S.signedIn=false; S.signinStep=1; save(); go('welcome'); toast('Signed out. Nothing has changed on the account.'); },
+  'verify-tab'(el){ S.verifyTab = el.dataset.tab; save(); render(); },
+  'demo-fill'(){ $('#ref').value='B7K4-2Q'; $('#cono').value = E().kind==='ltd' ? '11223344' : '09 / 02 / 1981'; $('#pc').value='CW1 3XY'; },
+  'signin-back'(){ S.signinStep=1; save(); render(); },
+  'otp-fill'(){ $$('.otp input').forEach((i,k)=> i.value = String((k*3+7)%10)); },
+  noop(el){ toast(el.dataset.msg || 'Connects to the back end later.'); },
+  copy(el){ const t = el.dataset.copy; (navigator.clipboard?.writeText(t) || Promise.reject()).then(()=>toast('Copied: '+t)).catch(()=>toast(t)); },
+  'goto-complain'(){ S.scrollTo='sec-complain'; save(); go('contact'); },
+  'goto-third'(){ S.scrollTo='sec-third'; save(); go('contact'); },
+  'goto-micro'(){ S.scrollTo='sec-micro'; save(); go('support'); },
+  'goto-rights'(){ S.scrollTo='sec-rights'; save(); go('account'); },
+  'goto-path'(){ S.scrollTo='sec-path'; save(); go('account'); },
+  'modal-close'(){ closeModal(); },
+  'plan-start'(){ S.changingPlan = !!S.plan; S.draft = { step:1, deposit:'min', depositAmt:'', months:3, freq:'monthly', first:'', method:'', custom:'' }; save(); },
+  'plan-back'(){ S.draft.step = Math.max(1,(S.draft.step||1)-1); save(); render(); },
+  'dep-pick'(el){ S.draft.deposit = el.dataset.v; save(); render(); },
+  'term-pick'(el){ S.draft.months = Number(el.dataset.m); S.draft.custom=''; save(); render(); },
+  'move-payment'(){
+    const p = planState(); if(!p || !p.next) return;
+    const opts = [3,5,7].map(n=>addDays(p.next,n));
+    openModal(`<h2>Move the next instalment</h2><p class="muted">By up to ${DEMO.rules.graceDays} days, once. Later instalments keep their dates.</p><div class="choices">${opts.map(d=>`<label class="choice"><input type="radio" name="mv" value="${toISO(d)}"><span class="t">${fmtDate(d)}</span></label>`).join('')}</div><div class="row"><button class="btn" data-action="move-confirm">Move it</button><button class="btn ghost" data-action="modal-close">Cancel</button></div>`);
+  },
+  'move-confirm'(){ const v = $('#modal input[name="mv"]:checked'); if(!v){ toast('Choose a date first.'); return; } const made=S.plan.made||0; const d=fromISO(v.value); let first=new Date(d); for(let i=0;i<made;i++){ first = S.plan.freq==='monthly'?addMonths(first,-1):addDays(first,-FREQ[S.plan.freq].days); } S.plan.first = toISO(first); S.missed=false; save(); closeModal(); render(); toast(`Moved to ${fmtDM(d)}. The schedule is updated.`); },
+  'retry-payment'(){ openModal(`<h2>Pay the missed instalment</h2><p class="muted">${gbp(S.plan.amount)} by ${S.plan.method==='dd'?'Direct Debit (represented within 3 working days)':'the saved card'} or pay-by-bank now.</p><div class="row"><button class="btn" data-action="retry-confirm">Take the payment</button><button class="btn ghost" data-action="modal-close">Cancel</button></div><p class="hint">Prototype: this simulates a successful payment.</p>`); },
+  'retry-confirm'(){ S.missed=false; S.plan.made=(S.plan.made||0)+1; save(); closeModal(); render(); toast('Received. The plan continues and nothing has been added.'); },
+  'disp-inv'(el){ const r = S.disputeDraft = S.disputeDraft||{}; let inv = (r.inv||[]).slice(); const no = el.dataset.no; if(no==='all'){ inv = inv.includes('all')?[]:['all']; } else { inv = inv.filter(x=>x!=='all'); inv = inv.includes(no)?inv.filter(x=>x!==no):inv.concat(no); } r.inv = inv; save(); $$('[data-action="disp-inv"]').forEach(b=>{ const on=inv.includes(b.dataset.no); b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); }); },
+  'diff-edit'(){ S.difficultyDraft = { ...(S.difficulty||{}) }; S.difficulty = null; save(); render(); },
+  'warm-referral'(){ openModal(`<h2>Ask Business Debtline to call you</h2><p class="muted">We pass the contact name and number to Business Debtline and nothing else, and hold the account for ${DEMO.rules.holdDays} days while you get advice.</p><label class="check"><input type="checkbox" id="wr-ok"><span>Yes, share the contact name and number with Business Debtline for this purpose.</span></label><div class="row"><button class="btn" data-action="warm-confirm">Request the call</button><button class="btn ghost" data-action="modal-close">Cancel</button></div>`); },
+  'warm-confirm'(){ if(!$('#wr-ok')?.checked){ toast('Tick the box to let us share the number.'); return; } S.hold = { reason:'You asked Business Debtline to call you about free advice.', next:`They usually call within two working days. Nothing is added in the meantime, and the deadline on the notice is paused.`, until:toISO(addDays(TODAY, DEMO.rules.holdDays)) }; S.scenario='hold'; save(); closeModal(); go('home'); toast('Requested. Business Debtline will call the contact number.'); },
+};
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-action]'); if(!a) return;
+  const fn = ACTIONS[a.dataset.action]; if(!fn) return;
+  const href = a.tagName==='A' ? (a.getAttribute('href')||'') : '';
+  const handled = ['goto-complain','goto-third','goto-micro','goto-rights','goto-path','brand'].includes(a.dataset.action);
+  if(href.startsWith('#')) e.preventDefault();
+  fn(a);
+  if(href.length>1 && href.startsWith('#') && !handled && V[href.slice(1)]) go(href.slice(1));
+});
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]'); if(!a || a.dataset.action) return;
+  const id = a.getAttribute('href').slice(1); e.preventDefault(); if(!id) return;
+  if(V[id]) { go(id); return; }
+  const t = document.getElementById(id); if(t){ t.scrollIntoView({block:'start'}); if(t.focus) t.focus({preventScroll:true}); }
+});
+$('#modal-bg').addEventListener('click', e => { if(e.target.id==='modal-bg') closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+/* ============================================================
+   Forms
+   ============================================================ */
+const FORMS = {
+  signin(){ const ref=$('#ref').value.trim(), co=$('#cono').value.trim(), pc=$('#pc').value.trim(); if(!ref||!co||!pc){ toast('Fill in all three boxes. Use the demo button if you like.'); return; } S.signinStep=2; save(); render(); },
+  otp(){ const code = $$('.otp input').map(i=>i.value).join(''); if(code.length<6){ toast('Enter all six digits.'); return; } signIn(); },
+  notme(){ toast('Thank you. We\'ve stopped contact while we check with the supplier.'); setTimeout(()=>go('welcome'), 800); },
+  pay(f){
+    const mode = f.querySelector('input[name="paymode"]:checked')?.value||'full'; const method = f.querySelector('input[name="paymethod"]:checked')?.value; const ps=planState(); const owed = ps?ps.remaining:bal(); let amt = owed;
+    if(mode==='other'){ amt = parseFloat($('#pay-other').value); if(!(amt>0)){ toast('Enter the amount to pay.'); return; } if(amt>owed){ toast(`That's more than the balance. The most to pay is ${gbp(owed)}.`); return; } }
+    if(!method){ toast('Choose how to pay.'); return; }
+    if(method==='transfer'){ openModal(`<h2>Bank transfer of ${gbp(amt)}</h2><p class="muted">Send it to the client account shown, with reference <b class="num">${E().ref}</b>. Tell us when it's sent and we note it on the account; it shows here within one working day.</p><div class="row"><button class="btn" data-action="noop" data-msg="Noted. We'll watch for the transfer and confirm when it lands.">I've sent it</button><button class="btn ghost" data-action="modal-close">Close</button></div>`); return; }
+    openModal(`<h2>Confirm the payment</h2><dl class="kv"><dt>Amount</dt><dd class="num">${gbp(amt)}</dd><dt>To</dt><dd>FB Collections, for ${DEMO.client.name}</dd><dt>Method</dt><dd>${method==='bank'?'Pay by bank':'Card'}</dd></dl><p class="hint">Prototype: the payment provider opens here. The button below simulates a successful payment.</p><div class="row"><button class="btn" data-action="pay-simulate" data-amt="${amt}">Simulate payment of ${gbp(amt)}</button><button class="btn ghost" data-action="modal-close">Cancel</button></div>`);
+  },
+  plan1(){ const d=S.draft; const dep=depositMin(); if(d.deposit==='other'){ const v=Number(String(d.depositAmt).replace(/[^0-9.]/g,''))||0; if(v<dep){ toast(`The up-front payment must be at least ${gbp(dep)}.`); return; } if(v>=bal()){ toast('That clears the balance: pay in full instead.'); go('pay'); return; } }
+    const p = draftPlan(nextDateSuggestion()); if(!p){ toast('Choose a term, or type a monthly amount.'); return; }
+    const v = Number(String(d.custom||'').replace(/[^0-9.]/g,''))||0; if(d.custom && v<DEMO.rules.minInstalment){ toast(`The minimum instalment is ${gbp(DEMO.rules.minInstalment)}.`); return; }
+    if(p.months > DEMO.rules.maxTermMonths+0.01){ toast(`That would take about ${Math.ceil(p.months)} months. Up to ${DEMO.rules.maxTermMonths} can be agreed here; for longer, tell us about the business or talk to ${DEMO.handler.first}.`); return; }
+    d.step=2; save(); render(); },
+  plan2(f){ const d=S.draft; const m=f.querySelector('input[name="method"]:checked'); if(!m){ toast('Choose how instalments are collected.'); return; } d.method=m.value; d.first=$('#first').value || toISO(nextDateSuggestion()); d.step=3; save(); render(); },
+  plan3(){ if(!$('#affirm').checked){ toast(E().kind==='ltd' ? 'Please confirm you are authorised to agree this for the company.' : 'Please confirm you agree to the terms.'); return; } const d=S.draft; const first = d.first?fromISO(d.first):nextDateSuggestion(); const p=draftPlan(first);
+    S.plan = { deposit:p.deposit, depositDate:toISO(TODAY), amount:p.amount, freq:d.freq, first:toISO(first), method:d.method, n:p.n, made:0, created:toISO(TODAY), end:toISO(p.end), rest:p.rest }; S.missed=false; S.changingPlan=false; S.lba=false; S.scenario='plan'; S.draft.step=1; save();
+    openModal(`<h2>Plan agreed.</h2><p>${gbp(p.deposit)} is being taken now, then ${p.n} instalments of ${gbp(p.amount)}, ${FREQ[d.freq].label.toLowerCase()}, from ${fmtDMY(first)}. Clears by ${fmtDMY(p.end)}.</p><p class="muted small">We've told ${DEMO.client.name}. Interest and compensation are frozen while every instalment is made. A confirmation and the terms go to the contact email now, and a reminder three days before each instalment.</p><div class="row"><button class="btn" data-action="plan-done">See the plan</button></div>`); },
+  dispute(f){ const r=f.querySelector('input[name="reason"]:checked'); if(!r){ toast('Choose what the problem is.'); return; } const inv=(S.disputeDraft||{}).inv||[]; if(!inv.length){ toast('Choose which invoices.'); return; } const text=$('#disp-text').value; S.dispute = { reason:r.value, inv, text, when:toISO(TODAY) }; const ins = r.value==='insolvency';
+    S.hold = { reason: ins ? (E().kind==='ltd' ? 'You told us the company is in an insolvency process.' : 'You told us you are in a formal debt solution or Breathing Space.') : `You disputed ${inv.includes('all')?'all three invoices':inv.join(', ')} (${r.value==='readings'?'estimated or wrong readings':r.value==='paid'?'already paid':r.value==='moved'?'left the premises':r.value==='contract'?'contract or broker dispute':'other'}), so we've asked ${DEMO.client.name} to check.`, next: ins ? (E().kind==='ltd' ? 'Collection has stopped. We will confirm the appointment with Companies House and deal with the insolvency practitioner from here.' : 'We are checking the register today. While we do, nothing is added and no action is taken.') : `We expect their answer within ${DEMO.rules.disputeDays} working days and will message the contact as soon as we have it. The deadline on the notice is paused; nothing is added while the dispute is open.`, until:toISO(addDays(TODAY, ins?60:14)) }; S.scenario='hold'; S.disputeDraft=null; S.lba=false; save(); go('home'); toast('Raised. The account is on hold while it is checked.'); },
+  difficulty(f){ const r=f.querySelector('input[name="dreason"]:checked'); if(!r){ toast('Choose the one closest to the situation.'); return; } const text=$('#diff-text').value; S.difficulty = { reason:r.value, text, when:toISO(TODAY) };
+    const ins = r.value==='insolvency';
+    S.hold = { reason: `You told us ${r.value==='cashflow'?'the business is waiting on its own customers':r.value==='trading'?'trading is down and the standard terms don\'t work':r.value==='ceased'?'the business has stopped trading or is about to':ins?(E().kind==='ltd'?'the company is entering an insolvency process':'you are taking advice about a formal debt solution'):'there is something personal affecting the business'}.`, next: ins ? 'Collection pauses while this is confirmed.' : `${DEMO.handler.name} will call the contact number within two working days to agree what happens next. The deadline on the notice is paused and nothing is added.`, until:toISO(addDays(TODAY, DEMO.rules.holdDays)) }; S.scenario='hold'; S.difficultyDraft=null; S.lba=false; save(); render(); },
+  callback(f){ const s=f.querySelector('input[name="slot"]:checked'); if(!s){ toast('Pick a time slot.'); return; } toast(`Booked. We'll call the mobile ending ${E().contact.mobileEnd} then.`); f.reset(); $$('.choice', f).forEach(c=>c.classList.remove('on')); },
+  message(f){ const t=$('#msg-text').value.trim(); if(!t){ toast('Write a message first.'); return; } toast(`Sent to ${DEMO.handler.first}. Reply within one working day.`); f.reset(); },
+};
+ACTIONS['pay-simulate'] = (el) => { const amt=Number(el.dataset.amt); const ps=planState(); const owed = ps?ps.remaining:bal(); closeModal(); if(Math.abs(amt-owed)<0.005){ S.paid=true; S.plan=null; S.hold=null; S.missed=false; S.lba=false; S.scenario='paid'; save(); go('home'); } else { if(S.plan){ S.plan.made=(S.plan.made||0)+Math.floor(amt/S.plan.amount); S.missed=false; save(); go('home'); toast(`Received ${gbp(amt)}. Thank you.`); } else { S.partial = (S.partial||0)+amt; save(); go('home'); toast(`Received ${gbp(amt)}. ${gbp(owed-amt)} is left: agree a plan for it before ${fmtDM(deadline())}.`); } } };
+ACTIONS['plan-done'] = () => { closeModal(); go('home'); };
+document.addEventListener('submit', e => { const f = e.target.closest('form'); e.preventDefault(); if(!f) return; const fn = FORMS[f.dataset.form]; if(fn) fn(f); });
+
+/* ============================================================
+   Prototype bar
+   ============================================================ */
+$('#scenario').addEventListener('change', e => { applyScenario(e.target.value); go('home'); toast('Scenario: ' + e.target.options[e.target.selectedIndex].text); });
+$('#entity').addEventListener('change', e => { S.entity = e.target.value; save(); render(); toast(`Customer: ${E().name}.`); });
+$('#jump').addEventListener('change', e => { const v=e.target.value; if(!v) return; if(!PUBLIC.has(v) && !S.signedIn){ S.signedIn=true; } if(v==='signin'){ S.signedIn=false; S.signinStep=1; } if(v==='plan'){ S.changingPlan=false; if(!S.plan) ACTIONS['plan-start'](); } if(v==='difficulty'){ S.difficulty=null; } save(); go(v); });
+$('#notes-btn').addEventListener('click', () => { S.notes = !S.notes; save(); render(); toast(S.notes ? 'Design rationale shown. Purple notes explain each element and cite the evidence.' : 'Design rationale hidden.'); });
+$('#reset-btn').addEventListener('click', () => { S = defaultState(); save(); go('welcome'); toast('Demo reset.'); });
+window.addEventListener('hashchange', () => { ROUTE = currentHash() || null; render(); });
+render();
+})();
+</script>
+</body>
+</html>
